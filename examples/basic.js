@@ -1,10 +1,11 @@
 import {createClass, DOM, createFactory} from 'react'
-import {Form, Entity, Input, Select} from '../lib'
+import {Form, ValueLink, Entity, Input, Select} from '../lib'
 
 const {button, a, p, option} = DOM
 const label = DOM.label.bind(null, null)
 const select = createFactory(Select)
 const form = createFactory(Form)
+const valueLink = createFactory(ValueLink)
 const entity = createFactory(Entity)
 const input = createFactory(Input)
 const genres = [
@@ -18,6 +19,9 @@ const genres = [
 const years = []
 
 for (let i = 1990; i < new Date().getFullYear() - 18; i++) years.push(i)
+
+const error = (props, children) =>
+  p({style: {color: 'red'}}, children)
 
 export default createClass({
   displayName: 'Basic form',
@@ -58,6 +62,18 @@ export default createClass({
       p(null, label('Name')),
       p(null, input({name: 'name'})),
 
+      p(null, label('Password')),
+      p(null, input({type: 'password', name: 'password'})),
+
+      p(null, label('Repeat your password')),
+      p(null, input({type: 'password', name: 'repeatPassword'})),
+
+      valueLink({to: ['password', 'repeatPassword'], test: ({password, repeatPassword}) => password !== repeatPassword},
+        error(null, 'passwords do not match')),
+
+      p(null, label('Name')),
+      p(null, input({name: 'name'})),
+
       p(null, label('Emails')),
       entity({name: 'emails'}, emails),
 
@@ -76,6 +92,9 @@ export default createClass({
       p(null, label(
         input({name: 'favoriteLanguage', type: 'radio', value: 'notJs'}),
         'Not Javascript')),
+
+      valueLink({to: 'favoriteLanguage', test: ({favoriteLanguage}) => favoriteLanguage !== 'js'},
+        error(null, 'GET OUT')),
 
       p(null, label('Favorite genres')),
       p(null, select({name: 'favoriteGenres', multiple: true},

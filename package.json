@@ -3,6 +3,10 @@
   "version": "0.0.0",
   "description": "yet another form abstraction library for react",
   "main": "index.js",
+  "scripts": {
+    "start": "heatpack examples/basic.js",
+    "test": "ava tests"
+  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/chrisamaral/recur.git"
