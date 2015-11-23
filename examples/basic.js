@@ -20,8 +20,7 @@ const years = []
 
 for (let i = 1990; i < new Date().getFullYear() - 18; i++) years.push(i)
 
-const error = (props, children) =>
-  p({style: {color: 'red'}}, children)
+const error = children => p({style: {color: 'red'}}, children)
 
 export default createClass({
   displayName: 'Basic form',
@@ -62,6 +61,11 @@ export default createClass({
       p(null, label('Name')),
       p(null, input({name: 'name'})),
 
+      p(null, label('Emails')),
+      entity({name: 'emails'}, emails),
+
+      a({href: '', onClick: this.moreEmails}, 'new email'),
+
       p(null, label('Password')),
       p(null, input({type: 'password', name: 'password'})),
 
@@ -69,15 +73,7 @@ export default createClass({
       p(null, input({type: 'password', name: 'repeatPassword'})),
 
       valueLink({to: ['password', 'repeatPassword'], test: ({password, repeatPassword}) => password !== repeatPassword},
-        error(null, 'passwords do not match')),
-
-      p(null, label('Name')),
-      p(null, input({name: 'name'})),
-
-      p(null, label('Emails')),
-      entity({name: 'emails'}, emails),
-
-      a({href: '', onClick: this.moreEmails}, 'new email'),
+        error('passwords do not match')),
 
       p(null, label('Born in')),
       p(null, select({name: 'birthYear'},
@@ -94,7 +90,7 @@ export default createClass({
         'Not Javascript')),
 
       valueLink({to: 'favoriteLanguage', test: ({favoriteLanguage}) => favoriteLanguage !== 'js'},
-        error(null, 'GET OUT')),
+        error('GET OUT')),
 
       p(null, label('Favorite genres')),
       p(null, select({name: 'favoriteGenres', multiple: true},
@@ -107,6 +103,12 @@ export default createClass({
       p(null, label('Phones')),
       entity({name: 'phones'},
         phones),
+
+      p(null, label('2 + 1')),
+      p(null, input({type: 'number', name: 'trivia'})),
+
+      valueLink({to: 'trivia', test: ({trivia}) => trivia !== 3},
+        error('WRONG')),
 
       a({href: '', onClick: this.morePhones}, 'new phone'),
 
