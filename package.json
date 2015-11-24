@@ -3,6 +3,7 @@
   "version": "0.0.2",
   "description": "yet another form abstraction library for react",
   "main": "lib/index.js",
+  "license": "MIT",
   "scripts": {
     "watch": "watchify --debug -v -t babelify examples/complex-form.js -o examples/bundle.js",
     "start": "st --no-cache --dir examples --index index.html",
@@ -10,12 +11,12 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/chrisamaral/recur.git"
+    "url": "git+https://github.com/chrisamaral/formerly.git"
   },
   "bugs": {
-    "url": "https://github.com/chrisamaral/recur/issues"
+    "url": "https://github.com/chrisamaral/formerly/issues"
   },
-  "homepage": "https://github.com/chrisamaral/recur",
+  "homepage": "https://github.com/chrisamaral/formerly",
   "devDependencies": {
     "babel-core": "^6.2.1",
     "babel-eslint": "^4.1.5",
