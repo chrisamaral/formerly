@@ -4,7 +4,7 @@
 
 A library for writing dynamic React forms with ease.
  
-```jsx
+```javascript
 import React, {createClass} from 'react'
 import {render} from 'react-dom'
 import {Form, Select, OnError, Input, Entity} from 'react-form-thing'

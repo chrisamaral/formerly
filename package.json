@@ -2,7 +2,7 @@
   "name": "formerly",
   "version": "0.0.1",
   "description": "yet another form abstraction library for react",
-  "main": "index.js",
+  "main": "lib/index.js",
   "scripts": {
     "watch": "watchify --debug -v -t babelify examples/complex-form.js -o examples/bundle.js",
     "start": "st --no-cache --dir examples --index index.html",
