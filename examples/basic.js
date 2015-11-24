@@ -56,7 +56,7 @@ export default createClass({
       })))
     }
 
-    return form({onSubmit: console.log.bind(console)},
+    return form({onSubmit: console.log.bind(console), onError: console.error.bind(console)},
 
       p(null, label('Name')),
       p(null, input({name: 'name', minLength: 4})),
