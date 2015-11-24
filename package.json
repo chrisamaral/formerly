@@ -1,6 +1,6 @@
 {
   "name": "formerly",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "description": "yet another form abstraction library for react",
   "main": "index.js",
   "scripts": {
