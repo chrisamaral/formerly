@@ -1,11 +1,12 @@
 import {createClass, DOM, createFactory} from 'react'
-import {Form, ValueLink, Entity, Input, Select} from '../lib'
+import {Form, OnValue, OnError, Entity, Input, Select} from '../lib'
 
 const {button, a, p, option} = DOM
 const label = DOM.label.bind(null, null)
 const select = createFactory(Select)
 const form = createFactory(Form)
-const valueLink = createFactory(ValueLink)
+const onValue = createFactory(OnValue)
+const onError = createFactory(OnError)
 const entity = createFactory(Entity)
 const input = createFactory(Input)
 const genres = [
@@ -73,7 +74,7 @@ export default createClass({
       p(null, label('Repeat your password')),
       p(null, input({type: 'password', name: 'repeatPassword'})),
 
-      valueLink({to: ['password', 'repeatPassword'], test: ({password, repeatPassword}) => password !== repeatPassword},
+      onValue({in: ['password', 'repeatPassword'], test: ({password, repeatPassword}) => password !== repeatPassword},
         error('passwords do not match')),
 
       p(null, label('Born in')),
@@ -90,7 +91,7 @@ export default createClass({
         input({name: 'favoriteLanguage', type: 'radio', value: 'notJs'}),
         'Not Javascript')),
 
-      valueLink({to: 'favoriteLanguage', test: ({favoriteLanguage}) => favoriteLanguage !== 'js'},
+      onValue({in: 'favoriteLanguage', test: ({favoriteLanguage}) => favoriteLanguage !== 'js'},
         error('GET OUT')),
 
       p(null, label('Favorite genres')),
@@ -108,8 +109,7 @@ export default createClass({
       p(null, label('2 + 1')),
       p(null, input({type: 'number', name: 'trivia', equals: 3})),
 
-      valueLink({to: 'trivia', test: ({trivia}) => trivia !== 3},
-        error('WRONG')),
+      onError({in: 'trivia'}, error('WRONG')),
 
       a({href: '', onClick: this.morePhones}, 'new phone'),
 
