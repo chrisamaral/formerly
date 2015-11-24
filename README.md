@@ -20,6 +20,17 @@ A library for writing dynamic React forms with ease.
   <label>Are you older than 18?</label>
   <Input type='checkbox' name='is18Plus'/>
   
+  <label>Your usual password</label>
+  <Input type='password' name='password' />
+  
+  <label>Repeat your password</label>
+  <Input type='password' name='repeatPassword' />
+  
+  <!-- ~~Exotic~~ -->
+  <OnValue in={['password', 'repeatPassword']} test={({password, repeatPassword}) => password === repeatPassword}>
+    Congratulations, you can type
+  </OnValue>
+  
   <Entity name='addresses'>
     
     <Entity name='home'>
@@ -61,7 +72,7 @@ and a clean API
 ```javascript
 import React, {createClass} from 'react'
 import {render} from 'react-dom'
-import {Form, Select, OnError, Input, Entity} from 'react-form-thing'
+import {Form, Select, OnError, OnValue, Input, Entity} from 'react-form-thing'
 
 const NewsletterForm = createClass({
   onSubmit ({is18Plus, emails}) {
