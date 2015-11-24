@@ -18,35 +18,35 @@ const UserForm = createClass({
     return form({ref: 'form'},
 
       label('name'),
-      input({name: 'name', value: ''}),
+      input({name: 'name', value: 'My name'}),
 
       label('Email'),
-      input({type: 'email', name: 'email'}),
+      input({type: 'email', name: 'email', value: 'email@examploe.com'}),
 
       entity({name: 'address'},
 
         entity({name: 'home'},
 
           label('Street'),
-          input({name: 'street', value: 'Avenida Rio Branco'},
+          input({name: 'street', value: 'Avenida Rio Branco'}),
 
-            label('Number'),
-            input({type: 'number', name: 'number', value: 1}),
+          label('Number'),
+          input({type: 'number', name: 'number', value: 1}),
 
-            label('Neighborhood'),
-            input({name: 'neighborhood', value: 'Centro'}),
+          label('Neighborhood'),
+          input({name: 'neighborhood', value: 'Centro'}),
 
-            label('Country'),
-            select({name: 'country'},
-              option('Brazil')),
+          label('Country'),
+          select({name: 'country'},
+            option('Brazil')),
 
-            label('State'),
-            select({name: 'state'},
-              option('RJ')),
+          label('State'),
+          select({name: 'state'},
+            option('RJ')),
 
-            label('City'),
-            select({name: 'city'},
-              option('Rio de Janeiro'))))),
+          label('City'),
+          select({name: 'city'},
+            option('Rio de Janeiro')))),
 
       entity({name: 'phones'},
         input({type: 'tel', name: 0, value: '21977668639'}),

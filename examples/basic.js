@@ -9,6 +9,7 @@ const valueLink = createFactory(ValueLink)
 const entity = createFactory(Entity)
 const input = createFactory(Input)
 const genres = [
+  'Country',
   'Eletronic',
   'Pop',
   'Rock',
@@ -93,7 +94,7 @@ export default createClass({
         error('GET OUT')),
 
       p(null, label('Favorite genres')),
-      p(null, select({name: 'favoriteGenres', multiple: true},
+      p(null, select({name: 'favoriteGenres', multiple: true, defaultValue: ['Country', 'Rap']},
         genres.map((value, key) =>
           option({key, value}, value)))),
 

@@ -1,24 +1,25 @@
-import test from 'ava'
+import {expect} from 'chai'
 import form from './_form'
 
-test(t => {
-  t.same({
-    name: 'input value',
-    email: 'email@examploe.com',
-    address: {
-      home: {
-        street: 'Avenida Rio Branco 1',
-        number: 1,
-        neighborhood: 'Centro',
-        state: 'RJ',
-        city: 'Rio de Janeiro'
-      }
-    },
-    phones: [
-      '21977668639',
-      '2130142818'
-    ]
-  }, form.serialize())
-
-  t.end()
+describe('serialization', () => {
+  it('works', () =>
+    expect({
+      name: 'My name',
+      email: 'email@examploe.com',
+      address: {
+        home: {
+          street: 'Avenida Rio Branco',
+          number: 1,
+          country: 'Brazil',
+          neighborhood: 'Centro',
+          state: 'RJ',
+          city: 'Rio de Janeiro'
+        }
+      },
+      phones: [
+        '21977668639',
+        '2130142818'
+      ]
+    }).to.deep.equal(form.serialize())
+  )
 })
