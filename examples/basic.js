@@ -42,7 +42,7 @@ export default createClass({
 
     for (let key = 0; key < numOfEmails; key++) {
       emails.push(entity({key, name: key},
-        p(null, input({name: 'address'})),
+        p(null, input({name: 'address', type: 'email'})),
         p(null, label(
           input({type: 'checkbox', name: 'sendSpam'}),
           'Send spam?'
@@ -59,7 +59,7 @@ export default createClass({
     return form({onSubmit: console.log.bind(console)},
 
       p(null, label('Name')),
-      p(null, input({name: 'name'})),
+      p(null, input({name: 'name', minLength: 4})),
 
       p(null, label('Emails')),
       entity({name: 'emails'}, emails),
@@ -105,7 +105,7 @@ export default createClass({
         phones),
 
       p(null, label('2 + 1')),
-      p(null, input({type: 'number', name: 'trivia'})),
+      p(null, input({type: 'number', name: 'trivia', equals: 3})),
 
       valueLink({to: 'trivia', test: ({trivia}) => trivia !== 3},
         error('WRONG')),
