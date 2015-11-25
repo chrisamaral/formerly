@@ -1,16 +1,8 @@
-import {createClass, createElement, DOM, createFactory} from 'react'
+import React, {PropTypes, cloneElement, Children, createClass} from 'react'
 import {render} from 'react-dom'
-import {Form, OnValue, TextArea, OnError, Entity, Input, Select} from '../lib'
+import {Form, OnValue, TextArea, Entity, Input, Select} from '../lib'
+import Selectable from './Selectable'
 
-const {button, a, p, option} = DOM
-const label = DOM.label.bind(null, null)
-const select = createFactory(Select)
-const form = createFactory(Form)
-const textArea = createFactory(TextArea)
-const onValue = createFactory(OnValue)
-const onError = createFactory(OnError)
-const entity = createFactory(Entity)
-const input = createFactory(Input)
 const genres = [
   'Country',
   'Eletronic',
@@ -20,16 +12,57 @@ const genres = [
   'Rap',
   'Classic'
 ]
+
 const years = []
+const updateSerialized = serialized => document.querySelector('pre').innerHTML = JSON.stringify(serialized, null, 2)
 
 for (let i = 1990; i < new Date().getFullYear() - 18; i++) years.push(i)
 
-const error = children => p({style: {color: 'red'}}, children)
+const InputWrapper = createClass({
+  displayName: 'InputWrapper',
+  propTypes: {
+    label: PropTypes.string,
+    type: PropTypes.string,
+    messages: PropTypes.object,
+    children: PropTypes.node.isRequired
+  },
+  getDefaultProps () {
+    return {type: 'form-group'}
+  },
+  getInitialState () {
+    return {error: null}
+  },
+  render () {
+    const {error} = this.state
+    const {type, messages, label, children} = this.props
+    const helpers = error
+      ? (
+      Object
+        .keys(error)
+        .map(key => messages[key]
+          ? <p key={key} className='help-block'>{messages[key]}</p>
+          : null
+        ).filter(Boolean)
+    ) : null
+
+    return (
+      <div className={type + (error ? ' has-error' : '')}>
+        {label && <label>{label}</label>}
+        {Children
+          .map(children,
+            child => cloneElement(child, {
+              onError: error => this.setState({error})
+            }))}
+        {helpers}
+      </div>
+    )
+  }
+})
 
 const ComplexForm = createClass({
   displayName: 'Complex form',
   getInitialState () {
-    return {numOfPhones: 1, numOfEmails: 1}
+    return {numOfPhones: 1, numOfEmails: 1, serialized: {}}
   },
   morePhones (e) {
     e.preventDefault()
@@ -39,88 +72,138 @@ const ComplexForm = createClass({
     e.preventDefault()
     this.setState(({numOfEmails}) => numOfEmails++ && ({numOfEmails}))
   },
+  componentDidMount () {
+    updateSerialized(this.refs.form.serialize())
+  },
   render () {
     const {numOfPhones, numOfEmails} = this.state
     const phones = []
     const emails = []
 
     for (let key = 0; key < numOfEmails; key++) {
-      emails.push(entity({key, name: key},
-        p(null, input({name: 'address', type: 'email'})),
-        p(null, label(
-          input({type: 'checkbox', name: 'sendSpam'}),
-          'Send spam?'
-        ))))
+      emails.push(
+        <Entity name={key} key={key}>
+          <div className='form-group'>
+            <Input className='form-control' name='address' type='email'/>
+          </div>
+          <div className='checkbox'>
+            <label>
+              <Input type='checkbox' name='sendSpam'/>
+              Send spam?
+            </label>
+          </div>
+        </Entity>
+      )
     }
 
     for (let key = 0; key < numOfPhones; key++) {
-      phones.push(p({key}, input({
-        type: 'tel',
-        name: key
-      })))
+      phones.push(<Input className='form-control' name={key} type='tel' key={key}/>)
     }
 
-    return form({onSubmit: console.log.bind(console), onError: console.error.bind(console)},
+    return (
+      <Form ref='form' onSubmit={console.log.bind(console)} onError={console.error.bind(console)}
+            onChange={updateSerialized}>
 
-      p(null, label('Name')),
-      p(null, input({name: 'name', minLength: 4})),
+        <div className='form-group'>
+          <label>Name</label>
+          <Input className='form-control' name='name' minLength={4}/>
+        </div>
 
-      p(null, label('Emails')),
-      entity({name: 'emails'}, emails),
+        <label>Emails</label>
 
-      a({href: '', onClick: this.moreEmails}, 'new email'),
+        <Entity name='emails'>
+          {emails}
+        </Entity>
 
-      p(null, label('Password')),
-      p(null, input({type: 'password', name: 'password'})),
+        <a href='' onClick={this.moreEmails}>new email</a>
 
-      p(null, label('Repeat your password')),
-      p(null, input({type: 'password', name: 'repeatPassword'})),
+        <Input name='thing'>
+          <Selectable/>
+        </Input>
 
-      onValue({in: ['password', 'repeatPassword'], test: ({password, repeatPassword}) => password !== repeatPassword},
-        error('passwords do not match')),
+        <div className='form-group'>
+          <label>Password</label>
+          <Input className='form-control' name='password' type='password'/>
+        </div>
 
-      p(null, label('Born in')),
-      p(null, select({name: 'birthYear'},
-        years.map((value, key) =>
-          option({key, value}, value)))),
+        <div className='form-group'>
+          <label>Repeat your password</label>
+          <Input className='form-control' name='repeatPassword' type='password'/>
+        </div>
 
-      p(null, label('Language of choice')),
-      p(null, label(
-        input({name: 'favoriteLanguage', type: 'radio', value: 'js'}),
-        'Javascript')),
+        <OnValue in={['password', 'repeatPassword']}
+                 test={({password, repeatPassword}) => password !== repeatPassword}>
+          <p className='text-danger'>Passwords do not match</p>
+        </OnValue>
 
-      p(null, label(
-        input({name: 'favoriteLanguage', type: 'radio', value: 'notJs'}),
-        'Not Javascript')),
+        <div className='form-group'>
+          <label>Born in</label>
+          <Select className='form-control' name='birthYear'>
+            {years.map((value, key) => (
+              <option key={key}>{value}</option>
+            ))}
+          </Select>
+        </div>
 
-      onValue({in: 'favoriteLanguage', test: ({favoriteLanguage}) => favoriteLanguage !== 'js'},
-        error('GET OUT')),
+        <label>Language of choice</label>
 
-      p(null, label('Favorite genres')),
-      p(null, select({name: 'favoriteGenres', multiple: true, defaultValue: ['Country', 'Rap']},
-        genres.map((value, key) =>
-          option({key, value}, value)))),
+        <div className='radio'>
+          <label>
+            <Input name='favoriteLanguage' type='radio' value='js'/>
+            Javascript
+          </label>
+        </div>
 
-      p(null, label('Profile picture')),
-      p(null, input({type: 'file', name: 'pic'})),
+        <div className='radio'>
+          <label>
+            <Input name='favoriteLanguage' type='radio' value='notJs'/>
+            Not Javascript
+          </label>
+        </div>
 
-      p(null, label('Phones')),
-      entity({name: 'phones'},
-        phones),
+        <OnValue in='favoriteLanguage' test={({favoriteLanguage}) => favoriteLanguage !== 'js'}>
+          <p className='text-danger'>GET OUT</p>
+        </OnValue>
 
-      p(null, label('2 + 1')),
-      p(null, input({type: 'number', name: 'trivia', shouldEqual: 3})),
+        <div className='form-group'>
+          <label>Favorite genres</label>
+          <Select className='form-control' name='favoriteGenres' value={['Country', 'Rap']} multiple>
+            {genres.map((value, key) => (
+              <option key={key}>{value}</option>
+            ))}
+          </Select>
+        </div>
 
-      onError({in: 'trivia'}, error('WRONG')),
+        <div className='form-group'>
+          <label>Profile picture</label>
+          <Input className='form-control' type='file' name='pic'/>
+        </div>
 
-      a({href: '', onClick: this.morePhones}, 'new phone'),
+        <label>Phones</label>
+        <Entity name='phones'>
+          {phones}
+        </Entity>
 
-      p(null, label('OBS')),
-      p(null, textArea({name: 'obs', required: true})),
-      onError({in: 'obs'}, error('Please talk to me')),
+        <a href='' onClick={this.morePhones}>new phones</a>
 
-      p(null, button({type: 'submit'}, 'Submit')))
+        <InputWrapper className='form-group' label='2 + 1' messages={{shouldEqual: 'Wrong answer'}}>
+          <Input className='form-control' type='number' name='trivia' shouldEqual={3}/>
+        </InputWrapper>
+
+        <InputWrapper label='OBS' messages={{required: 'Please talk to me!', length: 'go on... please'}}>
+          <TextArea className='form-control'
+                    name='obs'
+                    required
+                    minLength={10}/>
+        </InputWrapper>
+
+        <button className='btn btn-primary' type='submit'>
+          Submit
+        </button>
+
+      </Form>
+    )
   }
 })
 
-render(createElement(ComplexForm), document.getElementById('app'))
+render(<ComplexForm/>, document.getElementById('app'))

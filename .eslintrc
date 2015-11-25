@@ -1,5 +1,5 @@
 {
-  "extends": "standard",
+  "extends": ["standard", "standard-react"],
   "rules": {
     "no-extend-native": [0]
   }
