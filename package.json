@@ -1,6 +1,6 @@
 {
   "name": "formerly",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "description": "yet another form abstraction library for react",
   "main": "lib/index.js",
   "license": "MIT",
