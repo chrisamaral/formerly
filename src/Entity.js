@@ -1,9 +1,9 @@
-import TreeNodeMixin from './TreeNodeMixin'
-import {createClass, DOM, PropTypes} from 'react'
+const TreeNodeMixin = require('./TreeNodeMixin')
+const {createClass, DOM, PropTypes} = require('react')
 
 const {div} = DOM
 
-export default createClass({
+module.exports = createClass({
   mixins: [TreeNodeMixin],
   displayName: 'Entity',
   contextTypes: {

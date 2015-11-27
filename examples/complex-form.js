@@ -1,6 +1,6 @@
 import React, {PropTypes, cloneElement, Children, createClass} from 'react'
 import {render} from 'react-dom'
-import {Form, OnValue, TextArea, Entity, Input, Select} from '../lib'
+import {Form, OnValue, TextArea, Entity, Input, Select} from '../src'
 import Selectable from './Selectable'
 
 const genres = [

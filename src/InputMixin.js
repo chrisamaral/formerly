@@ -1,11 +1,11 @@
-import {PropTypes} from 'react'
+const {PropTypes} = require('react')
 
-import validateEmail from './validation/email'
-import validateRequired from './validation/required'
-import validateLength from './validation/length'
-import validateRange from './validation/range'
+const validateEmail = require('./validation/email')
+const validateRequired = require('./validation/required')
+const validateLength = require('./validation/length')
+const validateRange = require('./validation/range')
 
-export default {
+module.exports = {
   propTypes: {
     children: PropTypes.node,
     onError: PropTypes.func,

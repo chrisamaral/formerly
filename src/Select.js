@@ -1,14 +1,14 @@
-import {Children, DOM, createClass, PropTypes} from 'react'
-import almostSame from './utils/numberEqualString'
-import multipleSame from './utils/arrayEqual'
-import obj from 'object-path'
-import InputMixin from './InputMixin'
-import assign from 'object-assign'
-import omit from 'object.omit'
+const {Children, DOM, createClass, PropTypes} = require('react')
+const almostSame = require('./utils/numberEqualString')
+const multipleSame = require('./utils/arrayEqual')
+const obj = require('object-path')
+const InputMixin = require('./InputMixin')
+const assign = require('object-assign')
+const omit = require('object.omit')
 
 const {select} = DOM
 
-export default createClass({
+module.exports = createClass({
   mixins: [InputMixin],
   displayName: 'Select',
   isSelect: true,

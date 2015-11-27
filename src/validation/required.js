@@ -4,7 +4,7 @@
  * @param type
  * @returns {boolean}
  */
-export default (value, type) => {
+module.exports = (value, type) => {
   if (type === 'number') return typeof value === 'number'
 
   if (Array.isArray(value)) return Boolean(value.length)

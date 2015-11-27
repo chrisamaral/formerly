@@ -1,6 +1,7 @@
-import {cloneElement, DOM, Children, createClass, PropTypes} from 'react'
+const {cloneElement, DOM, Children, createClass, PropTypes} = require('react')
 const {div} = DOM
-export default createClass({
+
+module.exports = createClass({
   displayName: 'OnError',
   propTypes: {
     children: PropTypes.node.isRequired,

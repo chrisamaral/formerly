@@ -1,8 +1,8 @@
-import assign from 'object-assign'
-import TreeNodeMixin from './TreeNodeMixin'
-import {DOM, createClass, PropTypes} from 'react'
-import obj from 'object-path'
-import omit from 'object.omit'
+const assign = require('object-assign')
+const TreeNodeMixin = require('./TreeNodeMixin')
+const {DOM, createClass, PropTypes} = require('react')
+const obj = require('object-path')
+const omit = require('object.omit')
 
 class FormError extends Error {
   constructor (errors, values) {
@@ -14,7 +14,7 @@ class FormError extends Error {
 
 const {form} = DOM
 
-export default createClass({
+module.exports = createClass({
   mixins: [TreeNodeMixin],
   displayName: 'Form',
   propTypes: {

@@ -1,8 +1,8 @@
-import assign from 'object-assign'
-import almostSame from './utils/numberEqualString'
-import {DOM, cloneElement, Children, createClass} from 'react'
-import InputMixin from './InputMixin'
-import omit from 'object.omit'
+const assign = require('object-assign')
+const almostSame = require('./utils/numberEqualString')
+const {DOM, cloneElement, Children, createClass} = require('react')
+const InputMixin = require('./InputMixin')
+const omit = require('object.omit')
 
 const {div, input} = DOM
 
@@ -16,7 +16,7 @@ const parseInputType = (type, value) => {
   }
 }
 
-export default createClass({
+module.exports = createClass({
   mixins: [InputMixin],
   displayName: 'Input',
   readValue ({checked, type, value, files}) {

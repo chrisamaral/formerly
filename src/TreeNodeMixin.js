@@ -1,6 +1,6 @@
-import {PropTypes} from 'react'
+const {PropTypes} = require('react')
 
-export default {
+module.exports = {
   getChildContext  () {
     return {
       getAbsoluteName: this.getAbsoluteName,
