@@ -5,7 +5,7 @@
   "main": "lib/index.js",
   "license": "MIT",
   "scripts": {
-    "prepublish": "babel src --out-dir lib",
+    "prepublish": "rimraf lib && babel src --out-dir lib",
     "watch": "watchify --debug -v -t babelify examples/complex-form.js -o examples/bundle.js",
     "start": "st --no-cache --dir examples --index index.html",
     "test": "mocha --compilers js:babel-core/register tests"
@@ -36,6 +36,7 @@
     "jsdom": "^7.0.2",
     "mocha": "^2.3.4",
     "react-dom": "^0.14.3",
+    "rimraf": "^2.4.4",
     "st": "^1.0.0",
     "watchify": "^3.6.1"
   },
