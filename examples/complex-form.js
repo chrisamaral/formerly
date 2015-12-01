@@ -14,7 +14,7 @@ const genres = [
 ]
 
 const years = []
-const updateSerialized = serialized => document.querySelector('pre').innerHTML = JSON.stringify(serialized, null, 2)
+const updateSerialized = (e, serialized) => document.querySelector('pre').innerHTML = JSON.stringify(serialized, null, 2)
 
 for (let i = 1990; i < new Date().getFullYear() - 18; i++) years.push(i)
 
@@ -51,7 +51,7 @@ const InputWrapper = createClass({
         {Children
           .map(children,
             child => cloneElement(child, {
-              onError: error => this.setState({error})
+              onChange: (error, value) => value !== undefined && this.setState({value, error})
             }))}
         {helpers}
       </div>
@@ -101,8 +101,7 @@ const ComplexForm = createClass({
     }
 
     return (
-      <Form ref='form' onSubmit={console.log.bind(console)} onError={console.error.bind(console)}
-            onChange={updateSerialized}>
+      <Form ref='form' onChange={updateSerialized}>
 
         <div className='form-group'>
           <label>Name</label>

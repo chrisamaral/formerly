@@ -1,24 +1,33 @@
 const assign = require('object-assign')
 const almostSame = require('./utils/numberEqualString')
-const {DOM, cloneElement, Children, createClass} = require('react')
+const {PropTypes, DOM, cloneElement, Children, createClass} = require('react')
 const InputMixin = require('./InputMixin')
 const omit = require('object.omit')
 
 const {div, input} = DOM
 
-const parseInputType = (type, value) => {
-  switch (type) {
-    case 'hidden':
-    case 'file':
-      return undefined
-    default:
-      return value
-  }
-}
-
 module.exports = createClass({
   mixins: [InputMixin],
   displayName: 'Input',
+  propTypes: {
+    children: PropTypes.node,
+    onChange: PropTypes.func,
+    name: PropTypes.oneOfType([
+      PropTypes.string,
+      PropTypes.number
+    ]).isRequired,
+    defaultValue: PropTypes.any,
+    value: PropTypes.any,
+    textarea: PropTypes.bool,
+    type: PropTypes.string,
+    min: PropTypes.number,
+    max: PropTypes.number,
+    maxLength: PropTypes.number,
+    minLength: PropTypes.number,
+    shouldEqual: PropTypes.any,
+    validator: PropTypes.func,
+    required: PropTypes.bool
+  },
   readValue ({checked, type, value, files}) {
     switch (type) {
       case 'file':
@@ -26,7 +35,7 @@ module.exports = createClass({
       case 'checkbox':
         return Boolean(checked)
       case 'number':
-        return parseFloat(value)
+        return Number(value)
       default:
         return value
     }
@@ -35,36 +44,48 @@ module.exports = createClass({
     return almostSame(a, b)
   },
   render () {
-    const {getAbsoluteName} = this.context
-    const {value, error} = this.state
-    const {onChange, setValue} = this
-    const {name, children, textarea} = this.props
-    const otherProps = omit(this.props, 'name', 'children', 'textarea')
-
+    const name = this.getName()
+    let value = this.context.getValue(name)
+    const error = this.context.getError(name)
+    const {onChange} = this
+    const {children, textarea} = this.props
+    let defaultValue
     let type = this.props.type || 'text'
 
+    const ref = 'mainElement'
+
     if (!children) {
+      const otherProps = omit(this.props, 'name', 'children', 'textarea')
       const elem = textarea ? DOM.textarea : input
+      if (type === 'radio') value = this.props.value
+      if (type === 'file') value = undefined
+      if (type === 'number') {
+        defaultValue = value
+        value = undefined
+      }
       return elem(assign(otherProps, {
-        ref: 'recur',
-        name: getAbsoluteName(name),
+        'data-formerly': '',
+        ref,
+        name,
         type,
         onChange,
-        value: parseInputType(type, value)
+        value,
+        defaultValue
       }))
     }
 
     return div(null,
 
       input({
-        ref: 'recur',
-        name: getAbsoluteName(name),
+        'data-formerly': '',
+        name,
+        ref,
         type: 'hidden',
-        value: parseInputType('hidden', value)
+        value: undefined
       }),
 
       Children.map(children,
         child => cloneElement(child,
-          {setValue, value, error})))
+          {setValue: this.changeValueTo, value, error})))
   }
 })

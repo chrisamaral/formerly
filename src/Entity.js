@@ -1,15 +1,11 @@
-const TreeNodeMixin = require('./TreeNodeMixin')
 const {createClass, DOM, PropTypes} = require('react')
 
 const {div} = DOM
 
 module.exports = createClass({
-  mixins: [TreeNodeMixin],
   displayName: 'Entity',
   contextTypes: {
-    getAbsoluteName: PropTypes.func.isRequired,
-    waitForError: PropTypes.func.isRequired,
-    waitForValue: PropTypes.func.isRequired
+    getAbsoluteName: PropTypes.func.isRequired
   },
   propTypes: {
     children: PropTypes.node.isRequired,
@@ -18,8 +14,20 @@ module.exports = createClass({
       PropTypes.number
     ]).isRequired
   },
+  childContextTypes: {
+    getAbsoluteName: PropTypes.func.isRequired
+  },
+  getChildContext () {
+    return {
+      getAbsoluteName: this.getAbsoluteName
+    }
+  },
+  getAbsoluteName (path) {
+    return this.context.getAbsoluteName(this.props.name +
+      (path !== undefined ? '.' + path : ''))
+  },
   render  () {
-    return div({'data-name': this.context.getAbsoluteName(this.props.name), ref: 'recur'},
+    return div({'data-name': this.context.getAbsoluteName(this.props.name), ref: 'mainElement'},
       this.props.children)
   }
 })

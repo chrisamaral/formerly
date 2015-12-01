@@ -5,18 +5,28 @@ const obj = require('object-path')
 const InputMixin = require('./InputMixin')
 const assign = require('object-assign')
 const omit = require('object.omit')
+const validate = require('./validation')
 
 const {select} = DOM
 
 module.exports = createClass({
   mixins: [InputMixin],
   displayName: 'Select',
-  isSelect: true,
   propTypes: {
-    children: PropTypes.node.isRequired
+    children: PropTypes.node,
+    onChange: PropTypes.func,
+    name: PropTypes.oneOfType([
+      PropTypes.string,
+      PropTypes.number
+    ]).isRequired,
+    defaultValue: PropTypes.any,
+    value: PropTypes.any,
+    required: PropTypes.bool,
+    multiple: PropTypes.bool
   },
   componentWillMount () {
-    let {value, error} = this.state
+    const name = this.getName()
+    let value = this.context.getValue(name)
     const {children, multiple} = this.props
 
     if (value || multiple) return
@@ -28,8 +38,8 @@ module.exports = createClass({
       value = firstValue
     }
 
-    error = this.getError(value)
-    this.setState({value, error})
+    this.context.setValue(name, value)
+    this.context.setError(name, validate(value, this.props))
   },
   readValue ({value, multiple, options}) {
     let selected = multiple ? [] : value
@@ -51,15 +61,16 @@ module.exports = createClass({
     return almostSame(a, b) || (Array.isArray(a) && Array.isArray(b) && multipleSame(a, b))
   },
   render () {
-    const {value} = this.state
-    const {getAbsoluteName} = this.context
+    const name = this.getName()
+    const value = this.context.getValue(name)
     const {onChange} = this
-    const {name, children} = this.props
+    const {children} = this.props
     const otherProps = omit(this.props, 'name', 'children')
 
     return select(assign(otherProps, {
-      ref: 'recur',
-      name: getAbsoluteName(name),
+      'data-formerly': '',
+      ref: 'mainElement',
+      name,
       onChange,
       value
     }), children)

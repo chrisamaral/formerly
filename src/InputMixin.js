@@ -1,54 +1,23 @@
 const {PropTypes} = require('react')
-
-const validateEmail = require('./validation/email')
-const validateRequired = require('./validation/required')
-const validateLength = require('./validation/length')
-const validateRange = require('./validation/range')
+const obj = require('object-path')
+const validate = require('./validation')
 
 module.exports = {
-  propTypes: {
-    children: PropTypes.node,
-    onError: PropTypes.func,
-    onChange: PropTypes.func,
-    name: PropTypes.oneOfType([
-      PropTypes.string,
-      PropTypes.number,
-      PropTypes.array
-    ]).isRequired,
-    textarea: PropTypes.bool,
-    type: PropTypes.string,
-    min: PropTypes.number,
-    max: PropTypes.number,
-    maxLength: PropTypes.number,
-    minLength: PropTypes.number,
-    shouldEqual: PropTypes.any,
-    validator: PropTypes.func,
-    required: PropTypes.bool
-  },
   contextTypes: {
     getAbsoluteName: PropTypes.func.isRequired,
-    triggerChange: PropTypes.func.isRequired,
-    triggerError: PropTypes.func.isRequired
+    getValue: PropTypes.func.isRequired,
+    getError: PropTypes.func.isRequired,
+    setValue: PropTypes.func.isRequired,
+    setError: PropTypes.func.isRequired
   },
-  getInitialState () {
-    const state = {
-      value: this.props.value || this.props.defaultValue
+  componentWillMount () {
+    let value = this.props.value || this.props.defaultValue
+
+    if (value === undefined && this.props.type === 'checkbox') {
+      value = false
     }
 
-    if (state.value === undefined && this.props.type === 'checkbox') {
-      state.value = false
-    }
-
-    state.error = this.getError(state.value)
-    return state
-  },
-  componentDidMount () {
-    this.subscribers = []
-    this.refs.recur._subscribeTo = fn => {
-      this.subscribers.push(fn)
-      setTimeout(() => fn(this.state.value), 100)
-    }
-    this.refs.recur._RECUR_ = this
+    this.setValue(value)
   },
   componentWillReceiveProps ({value}) {
     const propsValue = this.props.value || this.props.defaultValue
@@ -57,46 +26,30 @@ module.exports = {
       this.setValue(value)
     }
   },
-  emitChange () {
-    const {onError, onChange} = this.props
-    const {name} = this.refs.recur
-    const {value, error} = this.state
-
-    if (onChange) onChange(value)
-    if (onError) onError(error)
-
-    this.context.triggerChange(name, value)
-    this.context.triggerError(name, error)
-  },
   setValue (value) {
-    this.setState(
-      {value, error: this.getError(value)},
-      this.emitChange
-    )
+    const {type, checked, onChange} = this.props
+    const isRadio = type === 'radio'
+    const isChecked = obj.get(this, 'refs.mainElement.checked', checked) === true
+
+    if (isRadio && !isChecked) return
+
+    const name = this.getName()
+    const error = validate(value, this.props)
+
+    this.context.setValue(name, value)
+    this.context.setError(name, error)
+
+    if (onChange) onChange(error, value)
   },
-  getError (value) {
-    const {type, min, max, maxLength, minLength, shouldEqual, validator, required} = this.props
-    const errors = {}
-
-    if (typeof validator === 'function') {
-      const res = validator(value)
-      if (!res || res instanceof Error) errors.custom = res
-    }
-
-    if (required && !validateRequired(value, type)) {
-      errors.required = true
-    } else {
-      if (shouldEqual !== undefined && shouldEqual !== value) errors.shouldEqual = true
-      if ((min !== undefined || max !== undefined) && !validateRange(value, min, max)) errors.range = true
-      if ((minLength !== undefined || maxLength !== undefined) && !validateLength(value, minLength, maxLength)) errors.length = true
-      if (type === 'email' && !validateEmail(value)) errors.email = true
-    }
-
-    return Object.keys(errors).length ? errors : null
+  getName () {
+    return this.context.getAbsoluteName(this.props.name)
   },
-
-  onChange ({target}) {
+  changeValueTo (value) {
     this.changedState = true
-    this.setValue(this.readValue(target))
+    this.setValue(value)
+    this.forceUpdate()
+  },
+  onChange ({target}) {
+    this.changeValueTo(this.readValue(target))
   }
 }

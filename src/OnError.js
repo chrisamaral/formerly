@@ -12,21 +12,27 @@ module.exports = createClass({
     ])
   },
   contextTypes: {
-    subscribeToError: PropTypes.func.isRequired
-  },
-  getInitialState () {
-    return {error: null}
+    getAbsoluteName: PropTypes.func.isRequired,
+    onError: PropTypes.func.isRequired,
+    getError: PropTypes.func.isRequired,
+    getValue: PropTypes.func.isRequired
   },
   componentDidMount () {
-    const {props} = this
-    this.context.subscribeToError(props.in, (error, value) => {
-      if (!this.isMounted() || value === undefined) return
-      this.setState({error, value})
-    })
+    this.unsubscribe = this.context.onError(this.getName(), () => this.forceUpdate())
+  },
+  componentWillUnmount () {
+    this.unsubscribe()
+  },
+  getName () {
+    return this.context.getAbsoluteName(this.props.in)
   },
   render () {
     const {props} = this
-    const {error} = this.state
+
+    const name = this.getName()
+    const value = this.context.getValue(name)
+    const error = this.context.getError(name)
+
     const {children, type} = props
 
     if (!error) return null
@@ -34,6 +40,6 @@ module.exports = createClass({
     if (typeof type === 'function' && error.custom instanceof type === false) return null
 
     return div(null, Children.map(children,
-      child => cloneElement(child, {error})))
+      child => cloneElement(child, {error, value})))
   }
 })

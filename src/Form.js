@@ -1,145 +1,85 @@
+const formState = require('./formState')
+const debounce = require('debounce')
 const assign = require('object-assign')
-const TreeNodeMixin = require('./TreeNodeMixin')
 const {DOM, createClass, PropTypes} = require('react')
 const obj = require('object-path')
 const omit = require('object.omit')
 
-class FormError extends Error {
-  constructor (errors, values) {
-    super('Form contains errors')
-    this.errors = errors
-    this.values = values
-  }
-}
-
-const {form} = DOM
-
 module.exports = createClass({
-  mixins: [TreeNodeMixin],
   displayName: 'Form',
+  isForm: true,
   propTypes: {
+    name: PropTypes.string,
     children: PropTypes.node.isRequired,
     useHTML5Validation: PropTypes.bool,
+    persist: PropTypes.bool,
     onSubmit: PropTypes.func,
-    onError: PropTypes.func,
     onChange: PropTypes.func
   },
-  componentWillMount () {
-    this.listeners = {}
-    this.errorListeners = {}
-  },
-  componentDidMount () {
-    for (let name in this.listeners) {
-      if (this.listeners.hasOwnProperty(name)) {
-        this.triggerChange(name)
-      }
-    }
-    for (let name in this.errorListeners) {
-      if (this.errorListeners.hasOwnProperty(name)) {
-        this.triggerError(name)
-      }
-    }
-  },
-  getChildContext () {
+  getDefaultProps () {
     return {
-      waitForValue: this.waitForValue,
-      waitForError: this.waitForError,
-      triggerChange: this.triggerChange,
-      triggerError: this.triggerError
+      name: Math.random().toString(36).substr(2)
     }
   },
   childContextTypes: {
-    waitForError: PropTypes.func.isRequired,
-    waitForValue: PropTypes.func.isRequired,
-    triggerChange: PropTypes.func.isRequired,
-    triggerError: PropTypes.func.isRequired
+    getAbsoluteName: PropTypes.func.isRequired,
+    onValue: PropTypes.func.isRequired,
+    getValue: PropTypes.func.isRequired,
+    setValue: PropTypes.func.isRequired,
+    onError: PropTypes.func.isRequired,
+    getError: PropTypes.func.isRequired,
+    setError: PropTypes.func.isRequired
   },
-  triggerChange (name, value) {
-    if (this.props.onChange) this.props.onChange(this.serialize())
-    if (!this.listeners[name]) return
-    this.listeners[name]
-      .forEach(fn =>
-        fn(value !== undefined
-          ? value
-          : this.getValueOf(name)))
-  },
-  triggerError (name, error, value) {
-    if (!this.errorListeners[name]) return
-    this.errorListeners[name]
-      .forEach(fn =>
-        fn(error !== undefined
-            ? error
-            : this.getErrorIn(name),
-          value !== undefined
-            ? value
-            : this.getValueOf(name)
-        ))
-  },
-  getValueOf (name) {
-    const {elements} = this.refs.form
-    for (let i in elements) {
-      const el = elements[i]
-
-      if (!el || typeof el !== 'object') continue
-      if (el.type === 'radio' && !el.checked) continue
-
-      if (el.name === name) return el._RECUR_.state.value
+  getChildContext () {
+    return {
+      getAbsoluteName: this.getAbsoluteName,
+      onValue: this.onValue,
+      getValue: this.getValue,
+      setValue: this.setValue,
+      onError: this.onError,
+      getError: this.getError,
+      setError: this.setError
     }
   },
-  getErrorIn (name) {
-    const {elements} = this.refs.form
-    for (let i in elements) {
-      const el = elements[i]
+  componentWillMount () {
+    assign(this, formState(this.props.name))
 
-      if (!el || typeof el !== 'object') continue
+    const _setValue = this.setValue
 
-      if (el.name === name) return el._RECUR_.state.error
-    }
-  },
-  waitForValue (name, fn) {
-    const listeners = this.listeners[name] = this.listeners[name] || []
-    listeners.push(fn)
-    return () => {
-      for (let i = 0; i < listeners.length; i++) {
-        if (listeners[i] === fn) {
-          listeners.splice(i, 1)
-          break
-        }
+    const callOnChange = debounce(() => {
+      const {onChange} = this.props
+
+      if (onChange) {
+        const {errors, values} = this.serialize()
+        onChange(errors, values)
       }
+    }, 100)
+
+    this.setValue = (...args) => {
+      _setValue(...args)
+      callOnChange()
     }
   },
-  waitForError (name, fn) {
-    const listeners = this.errorListeners[name] = this.errorListeners[name] || []
-    listeners.push(fn)
-    return () => {
-      for (let i = 0; i < listeners.length; i++) {
-        if (listeners[i] === fn) {
-          listeners.splice(i, 1)
-          break
-        }
-      }
-    }
+  getAbsoluteName (name) {
+    return name
   },
   onSubmit (e) {
     e.preventDefault()
 
-    const {onSubmit, onError} = this.props
-    const res = this.serialize(true)
+    const {onSubmit} = this.props
 
-    if (res instanceof Error) {
-      if (onError) onError(res.errors, res.values)
+    if (!onSubmit) return
 
-      return
-    }
+    const {errors, values} = this.serialize()
 
-    if (onSubmit) onSubmit(res)
+    onSubmit(errors, values)
   },
   reset () {
     this.refs.form.reset()
   },
-  serialize (validate) {
+  serialize () {
     const errors = obj({})
-    const model = obj({})
+    const values = obj({})
     const visited = {}
     const {elements} = this.refs.form
     let hasError = false
@@ -147,32 +87,33 @@ module.exports = createClass({
     for (const key in elements) {
       const el = elements[key]
 
-      if (!el || typeof el !== 'object') continue
+      if (!el || typeof el !== 'object' || el.name === undefined) continue
       if (el.type === 'radio' && !el.checked) continue
-      if (!el._RECUR_ || !el.name || visited[el.name] !== undefined) continue
+      if (el.dataset.formerly === undefined) continue
+
+      if (visited[el.name] !== undefined) continue
 
       visited[el.name] = true
 
-      if (el._RECUR_.state.error) {
+      const error = this.getError(el.name)
+
+      values.set(el.name, this.getValue(el.name))
+
+      if (error) {
         hasError = true
-        errors.set(el.name, el._RECUR_.state.error)
+        errors.set(el.name, error)
       }
-
-      if (obj.get(el, '_RECUR_.state.value') === undefined) continue
-
-      model.set(el.name, el._RECUR_.state.value)
     }
 
-    if (validate && hasError) {
-      return new FormError(errors.get(), model.get())
+    return {
+      errors: hasError ? errors.get() : null,
+      values: values.get()
     }
-
-    return model.get()
   },
   render () {
     const {onSubmit} = this
     const {children, useHTML5Validation} = this.props
-    return form(assign(omit(this.props, 'children', 'onChange', 'onSubmit', 'onError'), {
+    return DOM.form(assign(omit(this.props, 'children', 'onChange', 'onSubmit'), {
       onSubmit,
       ref: 'form',
       noValidate: !useHTML5Validation

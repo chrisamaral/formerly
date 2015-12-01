@@ -41,6 +41,9 @@
     "watchify": "^3.6.1"
   },
   "dependencies": {
+    "curry": "^1.2.0",
+    "debounce": "^1.0.0",
+    "emmett": "^3.1.1",
     "object-assign": "^4.0.1",
     "object-path": "^0.9.2",
     "object.omit": "^2.0.0"
