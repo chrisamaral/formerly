@@ -11,7 +11,7 @@ module.exports = {
     setError: PropTypes.func.isRequired
   },
   componentWillMount () {
-    let value = this.props.value || this.props.defaultValue
+    let value = this.props.value === undefined ? this.props.defaultValue : this.props.value
 
     if (value === undefined && this.props.type === 'checkbox') {
       value = false
@@ -20,7 +20,7 @@ module.exports = {
     this.setValue(value)
   },
   componentWillReceiveProps ({value}) {
-    const propsValue = this.props.value || this.props.defaultValue
+    const propsValue = this.props.value === undefined ? this.props.defaultValue : this.props.value
 
     if (!this.changedState && !(propsValue === value || this.same(propsValue, value))) {
       this.setValue(value)

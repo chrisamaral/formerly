@@ -32,7 +32,7 @@ module.exports = createClass({
     if (value || multiple) return
 
     const options = Children.toArray(children)
-    const firstValue = obj.get(options, '0.props.value') || obj.get(options, '0.props.children')
+    const firstValue = obj.get(options, '0.props.value', obj.get(options, '0.props.children'))
 
     if (typeof firstValue === 'number' || typeof firstValue === 'string') {
       value = firstValue
@@ -48,7 +48,9 @@ module.exports = createClass({
     for (let i in options) {
       if (!options[i].selected) continue
 
-      const optionValue = children[i].props.value || options[i].value
+      const optionValue = children[i].props.value === undefined
+        ? options[i].value
+        : children[i].props.value
 
       if (!multiple) return optionValue
 
