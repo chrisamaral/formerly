@@ -35,7 +35,7 @@ module.exports = createClass({
       case 'checkbox':
         return Boolean(checked)
       case 'number':
-        return Number(value)
+        return (typeof value === 'number' || isNaN(Number(value))) ? value : Number(value)
       default:
         return value
     }

@@ -5,7 +5,9 @@
  * @returns {boolean}
  */
 module.exports = (value, type) => {
-  if (type === 'number') return typeof value === 'number'
+  if (typeof value === 'string' && !value.trim()) return false
+
+  if (type === 'number') return !isNaN(Number(value))
 
   if (Array.isArray(value)) return Boolean(value.length)
 
