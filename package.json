@@ -8,7 +8,8 @@
     "prepublish": "rimraf lib && babel src --out-dir lib",
     "watch": "watchify --debug -v -t babelify examples/complex-form.js -o examples/bundle.js",
     "start": "st --no-cache --dir examples --index index.html",
-    "test": "mocha --compilers js:babel-core/register tests"
+    "test": "mocha --compilers js:babel-core/register tests",
+    "lint": "eslint src"
   },
   "repository": {
     "type": "git",

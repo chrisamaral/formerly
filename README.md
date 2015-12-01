@@ -9,7 +9,7 @@ A library for writing dynamic React forms with ease.
 `formerly` gives you a very flexible and idiomatic way to structure your forms
 
 ```html
-<Form ref='form' onSubmit={this.onSubmit} onError={this.onError}>
+<Form ref='form' onSubmit={this.onSubmit}>
         
   <label>Your name</label>
   <Input name='myName' value='nicolas cage' />
@@ -26,8 +26,9 @@ A library for writing dynamic React forms with ease.
   <label>Repeat your password</label>
   <Input type='password' name='repeatPassword' />
   
-  <!-- ~~Exotic~~ -->
+  <!-- zero boilerplate way to bind a random component to any input anywhere in your form -->
   <OnValue in={['password', 'repeatPassword']} test={({password, repeatPassword}) => password === repeatPassword}>
+    <!-- when using a custom component, "value" is passed as "props" -->
     Congratulations, you can type
   </OnValue>
   
@@ -75,25 +76,14 @@ import {render} from 'react-dom'
 import {Form, Select, OnError, OnValue, Input, Entity} from 'react-form-thing'
 
 const NewsletterForm = createClass({
-  onSubmit ({is18Plus, emails}) {
+  onSubmit (errors, {is18Plus, emails}) {
+    if (errors) return die(errors)
+    
     const url = is18Plus ? 'http://adult-site.com' : 'http://disney.com'
     
     fetch(url, {method: 'POST', body: emails})
       .then(() => alert('Check your SPAM box'))
       .then(() => this.refs.form.reset())
-  },
-  onError (errors, body) {
-    if (errors.hideSpot) {
-      return alert('You forgot some required fields')
-    } 
-    
-    if (errors.bestFriend) {
-      // bestFriend !== 'Obama'
-      return fetch('https://nsa.gov', {method: 'POST', body})
-        .then(() => location.href = 'http://www.wikihow.com/Deal-with-Being-in-Prison')
-    }
-    
-    alert("This is why we can't have nice things")
   },
   serialize () {
     return this.refs.form.serialize()
@@ -120,4 +110,18 @@ assert.deepEqual(form.serialize(), {
   emails: ['webmaster@example.com'],
   music: 'Country'
 })
+
+function die(errors) {
+  if (errors.hideSpot) {
+    return alert('You forgot some required fields')
+  } 
+  
+  if (errors.bestFriend) {
+    // bestFriend !== 'Obama'
+    return fetch('https://nsa.gov', {method: 'POST', body})
+      .then(() => location.href = 'http://www.wikihow.com/Deal-with-Being-in-Prison')
+  }
+  
+  alert("This is why we can't have nice things")
+}
 ```
