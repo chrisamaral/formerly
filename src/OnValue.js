@@ -21,14 +21,12 @@ module.exports = createClass({
   componentDidMount () {
     this.unsubscribers = []
     this.references().forEach(name =>
-      this.unsubscribers.push(this.context.onValue(name,
-        () => this.forceUpdate())))
+      this.unsubscribers.push(
+        this.context.onValue(this.context.getAbsoluteName(name),
+          () => this.forceUpdate())))
   },
   componentWillUnmount () {
     this.unsubscribers.forEach(fn => fn())
-  },
-  getName () {
-    return this.context.getAbsoluteName(this.props.in)
   },
   references () {
     const {props} = this
@@ -38,11 +36,11 @@ module.exports = createClass({
     const state = {}
 
     this.references()
-      .forEach(_n => {
-        const name = this.context.getAbsoluteName(_n)
+      .forEach(relativeName => {
+        const name = this.context.getAbsoluteName(relativeName)
         const value = this.context.getValue(name)
         if (value === undefined) return
-        state[name] = value
+        state[relativeName] = value
       })
 
     const {children, test} = this.props
