@@ -32,6 +32,8 @@ module.exports = createClass({
     switch (type) {
       case 'file':
         return files[0]
+      case 'radio':
+        return this.props.value !== undefined ? this.props.value : value
       case 'checkbox':
         return Boolean(checked)
       case 'number':
