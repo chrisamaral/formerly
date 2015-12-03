@@ -28,6 +28,19 @@ module.exports = createClass({
     validator: PropTypes.func,
     required: PropTypes.bool
   },
+  contextTypes: {
+    onValue: PropTypes.func.isRequired
+  },
+  componentDidMount () {
+    if (this.props.type === 'radio') {
+      this.unsubscribe = this.context.onValue(this.getName(), () => this.forceUpdate())
+    }
+  },
+  componentWillUnmount () {
+    if (this.unsubscribe) {
+      this.unsubscribe()
+    }
+  },
   readValue ({checked, type, value, files}) {
     switch (type) {
       case 'file':
@@ -59,7 +72,13 @@ module.exports = createClass({
     if (!children) {
       const otherProps = omit(this.props, 'name', 'children', 'textarea')
       const elem = textarea ? DOM.textarea : input
-      if (type === 'radio') value = this.props.value
+      if (type === 'radio') {
+        otherProps.checked = value === this.props.value
+        value = this.props.value
+      }
+      if (type === 'checkbox') {
+        otherProps.checked = Boolean(value)
+      }
       if (type === 'file') value = undefined
       if (type === 'number') {
         defaultValue = value

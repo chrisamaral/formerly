@@ -4,15 +4,19 @@ const assign = require('object-assign')
 const {DOM, createClass, PropTypes} = require('react')
 const obj = require('object-path')
 const omit = require('object.omit')
+const Emitter = require('emmett')
+
+const emitter = new Emitter()
 
 module.exports = createClass({
   displayName: 'Form',
   isForm: true,
   propTypes: {
     name: PropTypes.string,
+    value: PropTypes.object,
     children: PropTypes.node.isRequired,
     useHTML5Validation: PropTypes.bool,
-    persist: PropTypes.bool,
+//    persist: PropTypes.bool,
     onSubmit: PropTypes.func,
     onChange: PropTypes.func
   },
@@ -22,6 +26,9 @@ module.exports = createClass({
     }
   },
   childContextTypes: {
+    onReset: PropTypes.func.isRequired,
+    serializeForm: PropTypes.func.isRequired,
+    resetForm: PropTypes.func.isRequired,
     getAbsoluteName: PropTypes.func.isRequired,
     onValue: PropTypes.func.isRequired,
     getValue: PropTypes.func.isRequired,
@@ -32,6 +39,9 @@ module.exports = createClass({
   },
   getChildContext () {
     return {
+      onReset: this.onReset,
+      serializeForm: this.serialize,
+      resetForm: this.reset,
       getAbsoluteName: this.getAbsoluteName,
       onValue: this.onValue,
       getValue: this.getValue,
@@ -44,9 +54,11 @@ module.exports = createClass({
   componentWillMount () {
     assign(this, formState(this.props.name))
 
+    this.setRoot({}, this.props.value || {})
+
     const _setValue = this.setValue
 
-    const callOnChange = debounce(() => {
+    this.reportChange = debounce(() => {
       const {onChange} = this.props
 
       if (onChange) {
@@ -57,7 +69,7 @@ module.exports = createClass({
 
     this.setValue = (...args) => {
       _setValue(...args)
-      callOnChange()
+      this.reportChange()
     }
   },
   getAbsoluteName (name) {
@@ -74,8 +86,14 @@ module.exports = createClass({
 
     onSubmit(errors, values)
   },
+  onReset (fn) {
+    emitter.on('reset', fn)
+    return () => emitter.off('reset', fn)
+  },
   reset () {
     this.refs.form.reset()
+    this.setRoot({}, this.props.value || {})
+    emitter.emit('reset')
   },
   serialize () {
     const errors = obj({})
@@ -89,7 +107,7 @@ module.exports = createClass({
 
       if (!el || typeof el !== 'object' || el.name === undefined) continue
       if (el.type === 'radio' && !el.checked) continue
-      if (el.dataset.formerly === undefined) continue
+      if ((!el.dataset || el.dataset.formerly === undefined) && el.attributes['data-formerly'] === undefined) continue
 
       if (visited[el.name] !== undefined) continue
 
@@ -113,7 +131,7 @@ module.exports = createClass({
   render () {
     const {onSubmit} = this
     const {children, useHTML5Validation} = this.props
-    return DOM.form(assign(omit(this.props, 'children', 'onChange', 'onSubmit'), {
+    return DOM.form(assign(omit(this.props, 'value', 'children', 'onChange', 'onSubmit'), {
       onSubmit,
       ref: 'form',
       noValidate: !useHTML5Validation

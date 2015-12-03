@@ -2,6 +2,7 @@ import React, {PropTypes, cloneElement, Children, createClass} from 'react'
 import {render} from 'react-dom'
 import {Form, OnValue, TextArea, Entity, Input, Select} from '../src'
 import Selectable from './Selectable'
+import RandomResetButton from './RandomResetButton';
 
 const genres = [
   'Country',
@@ -13,6 +14,12 @@ const genres = [
   'Classic'
 ]
 
+const defaults = {
+  emails: [{address: 'email@example.com', sendSpam: true}],
+  favoriteLanguage: 'js',
+  birthYear: 1991,
+  favoriteGenres: ['Country', 'Rap']
+}
 const years = []
 const updateSerialized = (e, serialized) => document.querySelector('pre').innerHTML = JSON.stringify(serialized, null, 2)
 
@@ -101,7 +108,10 @@ const ComplexForm = createClass({
     }
 
     return (
-      <Form ref='form' onChange={updateSerialized}>
+      <Form ref='form'
+            value={defaults}
+            onSubmit={(e, body) => e && console.error(e)}
+            onChange={updateSerialized}>
 
         <div className='form-group'>
           <label>Name</label>
@@ -133,11 +143,14 @@ const ComplexForm = createClass({
         <OnValue in={['password', 'repeatPassword']}
                  test={({password, repeatPassword}) => password !== repeatPassword}>
           <p className='text-danger'>Passwords do not match</p>
+
+          <RandomResetButton/>
         </OnValue>
 
         <div className='form-group'>
           <label>Born in</label>
           <Select className='form-control' name='birthYear'>
+            <option value={null}>- Year -</option>
             {years.map((value, key) => (
               <option key={key}>{value}</option>
             ))}
@@ -166,7 +179,7 @@ const ComplexForm = createClass({
 
         <div className='form-group'>
           <label>Favorite genres</label>
-          <Select className='form-control' name='favoriteGenres' value={['Country', 'Rap']} multiple>
+          <Select className='form-control' name='favoriteGenres' multiple>
             {genres.map((value, key) => (
               <option key={key}>{value}</option>
             ))}

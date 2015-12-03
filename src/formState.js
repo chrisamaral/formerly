@@ -1,6 +1,7 @@
 const obj = require('object-path')
 const curry = require('curry')
 const Emitter = require('emmett')
+import assign from 'object-assign';
 
 const emitter = new Emitter()
 const state = obj({
@@ -25,12 +26,20 @@ const actions = {
   })
 }
 
-module.exports = formId => ({
-  onValue: actions.listen('value', formId),
-  getValue: actions.get('value', formId),
-  setValue: actions.set('value', formId),
-  onError: actions.listen('error', formId),
-  getError: actions.get('error', formId),
-  setError: actions.set('error', formId)
-})
+function formState (formId) {
+  return {
+    onValue: actions.listen('value', formId),
+    getValue: actions.get('value', formId),
+    setValue: actions.set('value', formId),
+    setRoot: (error, value) => {
+      state.set(`error.${formId}`, error)
+      state.set(`value.${formId}`, value)
+    },
+    root: state.get(),
+    onError: actions.listen('error', formId),
+    getError: actions.get('error', formId),
+    setError: actions.set('error', formId)
+  }
+}
 
+module.exports = formState

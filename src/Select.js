@@ -29,14 +29,12 @@ module.exports = createClass({
     let value = this.context.getValue(name)
     const {children, multiple} = this.props
 
-    if (value || multiple) return
+    if (value !== undefined || multiple) return
 
     const options = Children.toArray(children)
     const firstValue = obj.get(options, '0.props.value', obj.get(options, '0.props.children'))
 
-    if (typeof firstValue === 'number' || typeof firstValue === 'string') {
-      value = firstValue
-    }
+    if (firstValue !== undefined) value = firstValue
 
     this.context.setValue(name, value)
     this.context.setError(name, validate(value, this.props))
@@ -61,6 +59,10 @@ module.exports = createClass({
   },
   same (a, b) {
     return almostSame(a, b) || (Array.isArray(a) && Array.isArray(b) && multipleSame(a, b))
+  },
+  componentDidMount () {
+    // seems to be a bug where the <select>s don't keep the first value
+    this.forceUpdate()
   },
   render () {
     const name = this.getName()

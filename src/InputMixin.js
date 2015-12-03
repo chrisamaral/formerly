@@ -4,20 +4,34 @@ const validate = require('./validation')
 
 module.exports = {
   contextTypes: {
+    onReset: PropTypes.func.isRequired,
     getAbsoluteName: PropTypes.func.isRequired,
     getValue: PropTypes.func.isRequired,
     getError: PropTypes.func.isRequired,
     setValue: PropTypes.func.isRequired,
     setError: PropTypes.func.isRequired
   },
-  componentWillMount () {
-    let value = this.props.value === undefined ? this.props.defaultValue : this.props.value
+  getDefaultValue () {
+    const fromProps = this.props.value === undefined ? this.props.defaultValue : this.props.value
+    let value = fromProps !== undefined
+      ? fromProps
+      : this.context.getValue(this.getName())
 
     if (value === undefined && this.props.type === 'checkbox') {
       value = false
     }
 
-    this.setValue(value)
+    return value
+  },
+  componentWillMount () {
+    this.setValue(this.getDefaultValue())
+  },
+  componentDidMount () {
+    this.unsubscribe = this.context.onReset(
+      () => this.setValue(this.getDefaultValue()))
+  },
+  componentWillUnmount () {
+    this.unsubscribe()
   },
   componentWillReceiveProps ({value}) {
     const propsValue = this.props.value === undefined ? this.props.defaultValue : this.props.value

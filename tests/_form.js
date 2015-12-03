@@ -1,7 +1,7 @@
 import {getRootElem} from './_dom'
 import {render} from 'react-dom'
 import {DOM, createFactory, createClass} from 'react'
-import {Form, Input, Select, Entity} from '../lib'
+import {Form, Input, Select, Entity} from '../src'
 
 const option = DOM.option.bind(null, null)
 const label = DOM.label.bind(null, null)
@@ -12,7 +12,7 @@ const entity = createFactory(Entity)
 
 const UserForm = createClass({
   serialize () {
-    return this.refs.form.serialize()
+    return this.refs.form.serialize().values
   },
   render () {
     return form({ref: 'form'},
