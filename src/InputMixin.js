@@ -20,15 +20,19 @@ module.exports = {
     if (value === undefined && this.props.type === 'checkbox') {
       value = false
     }
-
+    if (value === undefined && this.firstOption) {
+      value = this.firstOption()
+    }
     return value
   },
   componentWillMount () {
     this.setValue(this.getDefaultValue())
   },
   componentDidMount () {
-    this.unsubscribe = this.context.onReset(
-      () => this.setValue(this.getDefaultValue()))
+    this.unsubscribe = this.context.onReset(() => {
+      this.setValue(this.getDefaultValue())
+      this.forceUpdate()
+    })
   },
   componentWillUnmount () {
     this.unsubscribe()

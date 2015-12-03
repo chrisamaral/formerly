@@ -5,7 +5,6 @@ const obj = require('object-path')
 const InputMixin = require('./InputMixin')
 const assign = require('object-assign')
 const omit = require('object.omit')
-const validate = require('./validation')
 
 const {select} = DOM
 
@@ -24,9 +23,7 @@ module.exports = createClass({
     required: PropTypes.bool,
     multiple: PropTypes.bool
   },
-  componentWillMount () {
-    const name = this.getName()
-    let value = this.context.getValue(name)
+  firstOption (value) {
     const {children, multiple} = this.props
 
     if (value !== undefined || multiple) return
@@ -36,8 +33,7 @@ module.exports = createClass({
 
     if (firstValue !== undefined) value = firstValue
 
-    this.context.setValue(name, value)
-    this.context.setError(name, validate(value, this.props))
+    return value
   },
   readValue ({value, multiple, options}) {
     let selected = multiple ? [] : value
