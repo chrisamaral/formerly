@@ -54,7 +54,7 @@ module.exports = createClass({
   componentWillMount () {
     assign(this, formState(this.props.name))
 
-    this.setRoot({}, this.props.value || {})
+    this.setRoot({}, assign({}, this.props.value))
 
     const _setValue = this.setValue
 
@@ -92,7 +92,7 @@ module.exports = createClass({
   },
   reset () {
     this.refs.form.reset()
-    this.setRoot({}, this.props.value || {})
+    this.setRoot({}, assign({}, this.props.value))
     emitter.emit('reset')
   },
   serialize () {
