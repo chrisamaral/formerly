@@ -44,6 +44,7 @@
   "dependencies": {
     "curry": "^1.2.0",
     "debounce": "^1.0.0",
+    "deepmerge": "^0.2.10",
     "emmett": "^3.1.1",
     "object-assign": "^4.0.1",
     "object-path": "^0.9.2",

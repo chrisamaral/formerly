@@ -1,7 +1,6 @@
 const obj = require('object-path')
 const curry = require('curry')
 const Emitter = require('emmett')
-import assign from 'object-assign';
 
 const emitter = new Emitter()
 const state = obj({
