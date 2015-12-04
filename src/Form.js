@@ -1,7 +1,7 @@
 const formState = require('./formState')
 const debounce = require('debounce')
 const assign = require('object-assign')
-const deepMerge = require('deepmerge')
+const assignDeep = require('assign-deep')
 const {DOM, createClass, PropTypes} = require('react')
 const obj = require('object-path')
 const omit = require('object.omit')
@@ -55,7 +55,7 @@ module.exports = createClass({
   componentWillMount () {
     assign(this, formState(this.props.name))
 
-    this.setRoot({}, deepMerge({}, this.props.value))
+    this.setRoot({}, assignDeep({}, this.props.value))
 
     const _setValue = this.setValue
 
@@ -93,7 +93,7 @@ module.exports = createClass({
   },
   reset () {
     this.refs.form.reset()
-    this.setRoot({}, deepMerge({}, this.props.value))
+    this.setRoot({}, assignDeep({}, this.props.value))
     emitter.emit('reset')
   },
   serialize () {
