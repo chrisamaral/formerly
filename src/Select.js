@@ -23,10 +23,45 @@ module.exports = createClass({
     required: PropTypes.bool,
     multiple: PropTypes.bool
   },
+  componentWillMount () {
+    this.filterSelected()
+  },
+  componentDidMount () {
+    // seems to be a bug where the <select>s don't keep the first value
+    this.forceUpdate()
+  },
+  componentWillReceiveProps (nextProps) {
+    this.filterSelected(nextProps)
+  },
+  filterSelected (props) {
+    const {multiple, children} = props || this.props
+    const name = this.getName()
+    const value = this.context.getValue(name)
+    let values = Array.isArray(value) ? value : [value]
+    const options = Children.toArray(children)
+    const deleted = []
+
+    for (let valueIndex = 0; valueIndex < values.length; valueIndex++) {
+      const value = values[valueIndex]
+      let found = false
+
+      for (let optionIndex = 0; optionIndex < options.length; optionIndex++) {
+        if (almostSame(options[optionIndex].props.value, value)) {
+          found = true
+          break
+        }
+      }
+      if (!found) deleted.push(value)
+    }
+
+    if (!deleted.length) return
+
+    this.setValue(multiple ? values.filter(v => deleted.indexOf(v) === -1) : this.firstOption())
+  },
   firstOption (value) {
     const {children, multiple} = this.props
 
-    if (value !== undefined || multiple) return
+    if (value !== undefined || multiple) return value
 
     const options = Children.toArray(children)
     const firstValue = obj.get(options, '0.props.value', obj.get(options, '0.props.children'))
@@ -55,10 +90,6 @@ module.exports = createClass({
   },
   same (a, b) {
     return almostSame(a, b) || (Array.isArray(a) && Array.isArray(b) && multipleSame(a, b))
-  },
-  componentDidMount () {
-    // seems to be a bug where the <select>s don't keep the first value
-    this.forceUpdate()
   },
   render () {
     const name = this.getName()
