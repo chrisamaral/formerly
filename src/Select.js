@@ -46,7 +46,8 @@ module.exports = createClass({
       let found = false
 
       for (let optionIndex = 0; optionIndex < options.length; optionIndex++) {
-        if (almostSame(options[optionIndex].props.value, value)) {
+        const optionValue = options[optionIndex].props.value
+        if (optionValue === value || almostSame(optionValue, value)) {
           found = true
           break
         }
