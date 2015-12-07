@@ -15,7 +15,19 @@ const actions = {
   }),
   set: curry((node, formId, inputName, value) => {
     const name = `${node}.${formId}.${inputName}`
+
     state.set(name, value)
+
+    let startAt = 1
+    let dotIndex = name.indexOf('.', startAt)
+
+    while (dotIndex >= 0) {
+      const currentPath = name.substr(0, dotIndex)
+      emitter.emit(currentPath, state.get(currentPath))
+      startAt = dotIndex + 1
+      dotIndex = name.indexOf('.', startAt)
+    }
+
     emitter.emit(name, value)
   }),
   listen: curry((node, formId, inputName, fn) => {
