@@ -41,7 +41,7 @@ module.exports = createClass({
       this.unsubscribe()
     }
   },
-  readValue ({checked, type, value, files}) {
+  readValue ({name, checked, type, value, files}) {
     switch (type) {
       case 'file':
         return files[0]
@@ -50,7 +50,8 @@ module.exports = createClass({
       case 'checkbox':
         return Boolean(checked)
       case 'number':
-        return (typeof value === 'number' || isNaN(Number(value))) ? value : Number(value)
+        this.skipValue = value === ''
+        return this.skipValue ? this.context.getValue(name) : Number(value)
       default:
         return value
     }
@@ -80,7 +81,7 @@ module.exports = createClass({
         otherProps.checked = Boolean(value)
       }
       if (type === 'file') value = undefined
-      if (type === 'number') {
+      if (type === 'number' && this.skipValue) {
         defaultValue = value
         value = undefined
       }
