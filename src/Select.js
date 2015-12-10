@@ -14,6 +14,7 @@ module.exports = createClass({
   propTypes: {
     children: PropTypes.node,
     onChange: PropTypes.func,
+    ignore: PropTypes.bool,
     name: PropTypes.oneOfType([
       PropTypes.string,
       PropTypes.number
@@ -96,11 +97,11 @@ module.exports = createClass({
     const name = this.getName()
     const value = this.context.getValue(name)
     const {onChange} = this
-    const {children} = this.props
-    const otherProps = omit(this.props, 'name', 'children')
+    const {children, ignore} = this.props
+    const otherProps = omit(this.props, 'name', 'children', 'ignore')
 
     return select(assign(otherProps, {
-      'data-formerly': '',
+      'data-formerly': ignore ? undefined : '',
       ref: 'mainElement',
       name,
       onChange,

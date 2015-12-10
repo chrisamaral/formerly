@@ -16,6 +16,7 @@ module.exports = createClass({
       PropTypes.string,
       PropTypes.number
     ]).isRequired,
+    ignore: PropTypes.bool,
     defaultValue: PropTypes.any,
     value: PropTypes.any,
     textarea: PropTypes.bool,
@@ -64,7 +65,7 @@ module.exports = createClass({
     let value = this.context.getValue(name)
     const error = this.context.getError(name)
     const {onChange} = this
-    const {children, textarea} = this.props
+    const {children, textarea, ignore} = this.props
     let defaultValue
     let type = this.props.type || 'text'
 
@@ -86,7 +87,7 @@ module.exports = createClass({
         value = undefined
       }
       return elem(assign(otherProps, {
-        'data-formerly': '',
+        'data-formerly': ignore ? undefined : '',
         ref,
         name,
         type,
@@ -99,7 +100,7 @@ module.exports = createClass({
     return div(null,
 
       input({
-        'data-formerly': '',
+        'data-formerly': ignore ? undefined : '',
         name,
         ref,
         type: 'hidden',
