@@ -104,23 +104,24 @@ module.exports = createClass({
     let hasError = false
 
     for (const key in elements) {
-      const el = elements[key]
+      const el = obj(elements[key])
+      const name = el.get('name')
 
-      if (!el || typeof el !== 'object' || el.name === undefined) continue
-      if (el.type === 'radio' && !el.checked) continue
-      if ((!el.dataset || el.dataset.formerly === undefined) && el.attributes['data-formerly'] === undefined) continue
+      if (name === undefined) continue
+      if (el.get('type') === 'radio' && !el.get('checked')) continue
+      if (el.get('dataset.formerly') !== '' && el.get('attributes.data-formerly.value') !== '') continue
 
-      if (visited[el.name] !== undefined) continue
+      if (visited[name] !== undefined) continue
 
-      visited[el.name] = true
+      visited[name] = true
 
-      const error = this.getError(el.name)
+      const error = this.getError(name)
 
-      values.set(el.name, this.getValue(el.name))
+      values.set(name, this.getValue(name))
 
       if (error) {
         hasError = true
-        errors.set(el.name, error)
+        errors.set(name, error)
       }
     }
 

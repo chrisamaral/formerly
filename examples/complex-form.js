@@ -118,6 +118,11 @@ const ComplexForm = createClass({
           <Input className='form-control' name='name' minLength={4}/>
         </div>
 
+        <div className='form-group'>
+          <label>Please ignore</label>
+          <Input className='form-control' name='rlyImportant' minLength={4} ignore/>
+        </div>
+
         <label>Emails</label>
 
         <Entity name='emails'>

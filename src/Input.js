@@ -87,7 +87,7 @@ module.exports = createClass({
         value = undefined
       }
       return elem(assign(otherProps, {
-        'data-formerly': ignore ? undefined : '',
+        'data-formerly': ignore ? null : '',
         ref,
         name,
         type,
@@ -100,7 +100,7 @@ module.exports = createClass({
     return div(null,
 
       input({
-        'data-formerly': ignore ? undefined : '',
+        'data-formerly': ignore ? null : '',
         name,
         ref,
         type: 'hidden',

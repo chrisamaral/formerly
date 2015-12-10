@@ -101,7 +101,7 @@ module.exports = createClass({
     const otherProps = omit(this.props, 'name', 'children', 'ignore')
 
     return select(assign(otherProps, {
-      'data-formerly': ignore ? undefined : '',
+      'data-formerly': ignore ? null : '',
       ref: 'mainElement',
       name,
       onChange,
