@@ -75,7 +75,7 @@ module.exports = createClass({
       const otherProps = omit(this.props, 'name', 'children', 'textarea')
       const elem = textarea ? DOM.textarea : input
       if (type === 'radio') {
-        otherProps.checked = value === this.props.value
+        otherProps.checked = value === otherProps.value || (value === undefined && (otherProps.checked || otherProps.defaultChecked))
         value = this.props.value
       }
       if (type === 'checkbox') {

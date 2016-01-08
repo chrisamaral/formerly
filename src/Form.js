@@ -11,7 +11,6 @@ const emitter = new Emitter()
 
 module.exports = createClass({
   displayName: 'Form',
-  isForm: true,
   propTypes: {
     name: PropTypes.string,
     value: PropTypes.object,
@@ -54,8 +53,7 @@ module.exports = createClass({
   },
   componentWillMount () {
     assign(this, formState(this.props.name))
-
-    this.setRoot({}, assignDeep({}, this.props.value))
+    this.setValueFromProps()
 
     const _setValue = this.setValue
 
@@ -91,9 +89,12 @@ module.exports = createClass({
     emitter.on('reset', fn)
     return () => emitter.off('reset', fn)
   },
+  setValueFromProps () {
+    this.setRoot({}, assignDeep({}, this.props.value))
+  },
   reset () {
     this.refs.form.reset()
-    this.setRoot({}, assignDeep({}, this.props.value))
+    this.setValueFromProps()
     emitter.emit('reset')
   },
   serialize () {

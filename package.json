@@ -51,7 +51,7 @@
     "object.omit": "^2.0.0"
   },
   "peerDependencies": {
-    "react": "^0.14.3"
+    "react": "^0.14.6"
   },
   "keywords": [
     "react",

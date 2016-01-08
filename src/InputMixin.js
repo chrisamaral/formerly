@@ -17,8 +17,14 @@ module.exports = {
       ? fromProps
       : this.context.getValue(this.getName())
 
-    if (value === undefined && this.props.type === 'checkbox') {
-      value = false
+    const {type, checked, defaultChecked} = this.props
+
+    if (type === 'checkbox') {
+      if (typeof checked === 'boolean') value = checked
+      if (typeof defaultChecked === 'boolean') value = defaultChecked
+      if (value === undefined) {
+        value = false
+      }
     }
     if (value === undefined && this.firstOption) {
       value = this.firstOption()
