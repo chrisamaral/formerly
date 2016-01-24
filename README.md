@@ -18,25 +18,6 @@ import {Form, Entity, Input, Select} from 'formerly'
 
 export default React.createClass({
   displayName: 'NewsletterForm',
-  handleSubmit (errors, formData) {
-    if (errors) return alert("please don't")
-    
-    // complicated AI stuff
-    if (formData.address.country === 'Somewhere in the global south') {
-      formData.sendSpam = false
-    }
-    if (formData.nonsense.match(/music/i)) {
-      formData.sendSpam = 'spotity'
-    }
-    if (formData.nonsense.match(/movies/i)) {
-      formData.sendSpam = 'netflix'
-    }
-    
-    fetch('/big-data', {
-      method: 'POST',
-      body: JSON.stringify(formData)
-    })
-  },
   render () {
     return (
       <Form onSubmit={this.handleSubmit}>
@@ -80,7 +61,26 @@ export default React.createClass({
         <button type='submit'>Submit</button>
       </Form>
     )
-  }
+  },
+  handleSubmit (errors, formData) {
+      if (errors) return alert("please don't")
+      
+      // complicated AI stuff
+      if (formData.address.country === 'Somewhere in the global south') {
+        formData.sendSpam = false
+      }
+      if (formData.nonsense.match(/music/i)) {
+        formData.sendSpam = 'spotity'
+      }
+      if (formData.nonsense.match(/movies/i)) {
+        formData.sendSpam = 'netflix'
+      }
+      
+      fetch('/big-data', {
+        method: 'POST',
+        body: JSON.stringify(formData)
+      })
+    }
 })
 
 ```
