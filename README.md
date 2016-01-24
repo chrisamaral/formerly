@@ -1,127 +1,90 @@
-#React Form Thing
+#Formerly
 
-[![js-standard-style](https://cdn.rawgit.com/feross/standard/master/badge.svg)](https://github.com/feross/standard)
+[![js-standard-style](https://img.shields.io/badge/code%20style-standard-brightgreen.svg)](http://standardjs.com/)
 
-A library for writing dynamic React forms with ease.
+A form library for React that tries to make dealing with huge forms easier, it is particularly useful for forms that map to nested data structures and demand validation.
+
+- Basics
+- Validation
+- Complex inputs
 
 ---------------
 
-`formerly` gives you a very flexible and idiomatic way to structure your forms
+## Basics
 
-```html
-<Form ref='form' onSubmit={this.onSubmit}>
-        
-  <label>Your name</label>
-  <Input name='myName' value='nicolas cage' />
-  
-  <label>Your best friend name</label>
-  <Input name='bestFriend' shouldEqual='Obama' value='None' />
-  
-  <label>Are you older than 18?</label>
-  <Input type='checkbox' name='is18Plus'/>
-  
-  <label>Your usual password</label>
-  <Input type='password' name='password' />
-  
-  <label>Repeat your password</label>
-  <Input type='password' name='repeatPassword' />
-  
-  <!-- zero boilerplate way to bind a random component to any input anywhere in your form -->
-  <OnValue in={['password', 'repeatPassword']} test={({password, repeatPassword}) => password === repeatPassword}>
-    <!-- when using a custom component, "value" is passed as "props" -->
-    Congratulations, you can type
-  </OnValue>
-  
-  <Entity name='addresses'>
-    
-    <Entity name='home'>
-      <label>Home address</label>
-      <Input name='streetAddress' value='1600 Pennsylvania Ave NW, Washington, DC 20500, United States' />
-      <Input name='reference' value='Largest house in the block' />
-    </Entity>
-    
-    <Entity name='hideSpot'>
-      <label>Secret hide spot</label>
-      <Input name='streetAddress' placeholder='Please fill this one' required />
-      
-      <OnError in='streetAddress'>
-        You really should fill this one
-      </OnError>
-      
-      <Input name='reference' />
-    </Entity>
-    
-  </Entity>
-  
-  <label>Emails</label>
-  <Entity name='emails'>
-      <Input name={0} type='email' value='webmaster@example.com' />
-  </Entity>
-  
-  <label>Favorite music</label>
-  <Select name='music'>
-    <option>Country</option>
-    <option>Rap</option>
-  </Select>
-  
-  <button type='submit'>Submit</button>
-</Form>
-```
+```js
+import React from 'react'
+import {Form, Entity, Input, Select} from 'formerly'
 
-and a clean API
-
-```javascript
-import React, {createClass} from 'react'
-import {render} from 'react-dom'
-import {Form, Select, OnError, OnValue, Input, Entity} from 'react-form-thing'
-
-const NewsletterForm = createClass({
-  onSubmit (errors, {is18Plus, emails}) {
-    if (errors) return die(errors)
+export default React.createClass({
+  displayName: 'NewsletterForm',
+  handleSubmit (errors, formData) {
+    if (errors) return alert("please don't")
     
-    const url = is18Plus ? 'http://adult-site.com' : 'http://disney.com'
+    // complicated AI stuff
+    if (formData.address.country === 'Somewhere in the global south') {
+      formData.sendSpam = false
+    }
+    if (formData.nonsense.match(/music/i)) {
+      formData.sendSpam = 'spotity'
+    }
+    if (formData.nonsense.match(/movies/i)) {
+      formData.sendSpam = 'netflix'
+    }
     
-    fetch(url, {method: 'POST', body: emails})
-      .then(() => alert('Check your SPAM box'))
-      .then(() => this.refs.form.reset())
+    fetch('/big-data', {
+      method: 'POST',
+      body: JSON.stringify(formData)
+    })
   },
-  serialize () {
-    return this.refs.form.serialize()
-  }
   render () {
     return (
-      // [ ... ]
+      <Form onSubmit={this.handleSubmit}>
+        
+        <label>Your name</label>
+        <Input name='name' placeholder='nicolas cage' />
+        
+        <label>Email</label>
+        <Input type='email' name='email' />
+        
+        <h3>Please help us know how to reach you</h3>
+        <hr/>
+
+        <Entity name='address'>
+          <label>Street address</label>
+          <Input name='streetAddress' />
+
+          <label>Country</label>
+          <Select name='country'>
+            <option>France</option>
+            <option>United States</option>
+            <option>England</option>
+            <option>Japan</option>
+            <option>Germany</option>
+            <option>Somewhere in the global south</option>
+          </Select>
+        </Entity>
+        
+        <hr/>
+        
+        <label>Tell us more about yourself</label>
+        <TextArea name='nonsense' />
+        
+        <div className='very-small-text'>
+          <Input id='sendSpam' type='checkbox' name='sendSpam' defaultValue={true} />
+          <label htmlFor='sendSpam'>
+            Would you like to discover the meaning of life?
+          </label>
+        </div>
+        
+        <button type='submit'>Submit</button>
+      </Form>
     )
   }
 })
 
-const form = render(<NewsletterForm />, document.body)
-
-assert.deepEqual(form.serialize(), {
-  myName: 'nicolas cage',
-  bestFriend: 'None',
-  is18Plus: false,
-  addresses: {
-    home: {
-      streetAddress: '1600 Pennsylvania Ave NW, Washington, DC 20500, United States',
-      reference: 'Largest house in the block'
-    }
-  },
-  emails: ['webmaster@example.com'],
-  music: 'Country'
-})
-
-function die(errors) {
-  if (errors.hideSpot) {
-    return alert('You forgot some required fields')
-  } 
-  
-  if (errors.bestFriend) {
-    // bestFriend !== 'Obama'
-    return fetch('https://nsa.gov', {method: 'POST', body})
-      .then(() => location.href = 'http://www.wikihow.com/Deal-with-Being-in-Prison')
-  }
-  
-  alert("This is why we can't have nice things")
-}
 ```
+
+Diving into the contrived example above, we can see `formerly` exposes five key components: the first four are just extensions to native elements, namely, `Form`, `Input`, `Select` and `TextArea`.
+The later three won't work outside a `Form` and `formerly` ignores any other native `<input>` you put inside the form... you see, it tries to get out of your way.
+`Entity`, put simply, is an notation for creating nested objects or arrays (more on that later).
