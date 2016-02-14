@@ -2,7 +2,7 @@
 
 [![js-standard-style](https://img.shields.io/badge/code%20style-standard-brightgreen.svg)](http://standardjs.com/)
 
-A form library for React, particularly useful for forms that need to map to nested objects and demand validation.
+A modest form library for React, designed to make large form serialization and validation easier.
 
 - Basics
 - Nesting
@@ -13,69 +13,145 @@ A form library for React, particularly useful for forms that need to map to nest
 
 ## Basics
 
-First thing you want to do is understand how to assemble your form from `formerly` components and use serialization.
+First thing you want to do is understand how to assemble your form from `formerly` components and use basic serialization.
 
 ```js
 import React from 'react'
 import {Form, Input, Select} from 'formerly'
 
-export default React.createClass({
-  displayName: 'NewsletterForm',
-  render () {
-    return (
-      <Form onSubmit={this.handleSubmit}>
+function NewsletterForm () {
+   return (
+     <Form onSubmit={handleSubmit}>
 
-        <label>Your name</label>
-        <Input name='name' placeholder='nicolas cage' />
+       <label>Your name</label>
+       <Input name='name' placeholder='nicolas cage' required/>
 
-        <label>Email</label>
-        <Input type='email' name='email' />
+       <label>Email</label>
+       <Input type='email' name='email' />
 
-        <label>How do you commute to work?</label>
-        <Select name='wayOfTransp'>
-          <option>Car</option>
-          <option>Bus</option>
-          <option>Bike</option>
-          <option>Dont work</option>
-        </Select>
+       <label>How do you commute to work?</label>
+       <Select name='wayOfTransp'>
+         <option>Car</option>
+         <option>Bus</option>
+         <option>Bike</option>
+         <option>Dont work</option>
+       </Select>
 
-        <label>Tell us more about yourself</label>
-        <TextArea name='nonsense' />
-        
-        <div className='very-small-text'>
-          <Input id='sendSpam' type='checkbox' name='sendSpam' defaultValue={true} />
-          <label htmlFor='sendSpam'>
-            Would you like to discover the meaning of life?
-          </label>
-        </div>
+       <label>Tell us more about yourself</label>
+       <TextArea name='nonsense' />
 
-        <button type='submit'>Submit</button>
-      </Form>
-    )
-  },
-  handleSubmit (errors, formData) {
-    if (errors) return alert("please don't")
+       <div className='very-small-text'>
+         <Input id='sendSpam' type='checkbox' name='sendSpam' defaultValue={true} />
+         <label htmlFor='sendSpam'>
+           Would you like to discover the meaning of life?
+         </label>
+       </div>
 
-    // complicated AI stuff
-    if (formData.nonsense.match(/music/i)) {
-      formData.sendSpamFrom = 'spotity'
-    }
-    
-    fetch('/big-data', {
-      method: 'POST',
-      body: JSON.stringify(formData)
-    })
-  }
-})
+       <button type='submit'>Submit</button>
+     </Form>
+   )
+}
+
+function handleSubmit (errors, formData) {
+  if(errors) return alert("please don't")
+
+   // complicated AI stuff
+   if (formData.nonsense.match(/music/i)) {
+     formData.sendSpamFrom = 'spotity'
+   }
+
+   fetch('/big-data', {
+     method: 'POST',
+     body: JSON.stringify(formData)
+   })
+}
 ```
 
-Diving into the contrived example above, we can see `formerly` exposes a few components with familiar sounding names, `Form`, `Input`, `Select` and `TextArea`. 
-You can think of them as extensions to native elements. **They won't work outside a `Form` and `formerly` wont serialize any other native `<input>` you put inside the `Form`.**
+Diving into the contrived example above, we can see `formerly` exposes a few components with familiar sounding names, `Form`, `Input`, `Select` and `TextArea`.
+You can think of them as extensions to native elements. **Important takeaway: ** *They won't work outside a `Form` and `formerly` wont serialize any other native `<input>` you put inside the `Form`.*
 
 ## Nesting
 
-An important use case is 
+An important use case we wanted to get just right was the serialization of large forms, which are often complex and have nested objects/arrays in them.
+
+So let's say you work for Wikipedia and you have this **person** database storing all kinds of creepy personal information, our hypothetical object representation for a random personality could look like this:
+
+```js
+const thisOnePerson = {
+	fullName: 'Samuel L. Jackson',
+	occupations: ['actor', 'film producer'],
+	almaMater: 'Morehouse College',
+	birth: {
+	  day: '12/21/1948',
+	  place: 'Washington, D.C., U.S.'
+	},
+	significantOther: {
+		fullName: 'LaTanya Richardson',
+		occupations: ['actress', 'producer']
+	},
+	children: ['Zoe Jackson']
+}
+```
+
+Now your job is to come up with a *single form* to fill all this stuff, scary right? Of course it is, especially from the user perspective but a job is a job so... Anyway, `formerly` is a nice fit for this kind of thing, here is how:
+
+```js
+import {Form, Entity, Input, Select} from 'formerly'
+
+function handleSubmit (errors, person) {
+ // ...
+}
+
+
+function PersonForm (props) {
+  return (
+    <Form onSubmit={handleSubmit}>
+		<LabeledInput name='fullName' value={props.fullName}>
+			Person Name
+		</LabeledInput>
+		<Occupations occupations={props.occupations} />
+		<SignificantOther {...props.significantOther} />
+    </Form>
+  )
+}
+
+function LabeledInput ({children, label, inputName, value}) {
+	return (
+		<div>
+			<label>{children}</label>
+			<Input name='fullName' value={fullName} />
+		</div>
+	)
+}
+
+function Occupations ({occupations, addOccupation}) {
+  return (
+    <Entity name='occupations'>
+		{occupations.map((occupation, index) => (
+		 <div>
+		    <label>Ocupation</label>
+		    <Input name={index} value={occupation} />
+		    <!--
+			     a numeric *name* hints formerly to
+			     represent the entity above as an array
+		    -->
+		  </div>
+		))}
+
+		{addOccupation && (
+			<button onClick={addOccupation}>
+			  Add occupation
+		    </button>)}
+	</Entity>
+  )
+}
+function SignificantOther ({fullName, occupations}) {
+
+}
+
+export default PersonForm
+```
 
 ## API
 
-- * Form * - 
+- * Form * -
