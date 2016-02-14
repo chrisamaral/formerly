@@ -2,7 +2,7 @@
 
 [![js-standard-style](https://img.shields.io/badge/code%20style-standard-brightgreen.svg)](http://standardjs.com/)
 
-A modest form library for React, designed to make large form serialization and validation easier.
+A modest form library for React, designed to make large form serialization and validation easier. It aims to do so while keeping a healthy balance between declarativeness and readability.
 
 - Basics
 - Nesting
@@ -89,11 +89,12 @@ const thisOnePerson = {
 		fullName: 'LaTanya Richardson',
 		occupations: ['actress', 'producer']
 	},
-	children: ['Zoe Jackson']
+	children: [{
+		fullName: 'Zoe Jackson'
+	}]
 }
 ```
-
-Now your job is to come up with a *single form* to fill all this stuff, scary right? Of course it is, especially from the user perspective but a job is a job so... Anyway, `formerly` is a nice fit for this kind of thing, here is how:
+Now your job is to come up with a *single form* to fill all this stuff, scary right? Of course it is, especially from a UX point of view but a job is a job so... `formerly` to the rescue! Here is how we could represent that same object as a form component:
 
 ```js
 import {Form, Entity, Input, Select} from 'formerly'
@@ -102,51 +103,59 @@ function handleSubmit (errors, person) {
  // ...
 }
 
-
-function PersonForm (props) {
+function PersonForm () {
   return (
     <Form onSubmit={handleSubmit}>
-		<LabeledInput name='fullName' value={props.fullName}>
-			Person Name
-		</LabeledInput>
-		<Occupations occupations={props.occupations} />
-		<SignificantOther {...props.significantOther} />
+	    <label>Person Name</label>
+	    <Input name='fullName' value='Samuel L. Jackson' />
+
+		<h3>Occupations</h3><hr/>
+		<Entity name='occupations'>
+  		    <!-- using a number as *name* hints formerly
+			    to serialize the entity as an array -->
+
+		    <Input name={0} value='actor' />
+		    <Input name={1} value='film producer' />
+		</Entity>
+
+		<label>Alma Mater</label>
+		<Select name='almaMater'>
+			<option>Morehouse College</option>
+			<option>École Normale Superieure</option>
+			<option>Oxford</option>
+			<option>USP</option>
+		</Select>
+
+
+		<Entity name='birth'>
+			<label>Birthday</label>
+			<Input type='date' name='day' value='1948-12-21' />
+
+			<label>Birth place</label>
+			<Input name='place' value='Washington, D.C., U.S.' />
+		</Entity>
+
+		<Entity name='significantOther'>
+		    <label>Significant Other</label>
+		    <Input name='fullName' value='LaTanya Richardson' />
+
+			<h3>Occupations</h3><hr/>
+			<Entity name='occupations'>
+			    <Input name={0} value='actress' />
+			    <Input name={1} value='producer' />
+			</Entity>
+		</Entity>
+
+		<Entity name='children'>
+			<Entity name={0}>
+				<label>Child name</label>
+			    <Input name='fullName' value='Zoe Jackson' />
+		    </Entity>
+		</Entity>
+
+       <button type='submit'>Submit</button>
     </Form>
   )
-}
-
-function LabeledInput ({children, label, inputName, value}) {
-	return (
-		<div>
-			<label>{children}</label>
-			<Input name='fullName' value={fullName} />
-		</div>
-	)
-}
-
-function Occupations ({occupations, addOccupation}) {
-  return (
-    <Entity name='occupations'>
-		{occupations.map((occupation, index) => (
-		 <div>
-		    <label>Ocupation</label>
-		    <Input name={index} value={occupation} />
-		    <!--
-			     a numeric *name* hints formerly to
-			     represent the entity above as an array
-		    -->
-		  </div>
-		))}
-
-		{addOccupation && (
-			<button onClick={addOccupation}>
-			  Add occupation
-		    </button>)}
-	</Entity>
-  )
-}
-function SignificantOther ({fullName, occupations}) {
-
 }
 
 export default PersonForm
@@ -154,4 +163,4 @@ export default PersonForm
 
 ## API
 
-- * Form * -
+- Form
