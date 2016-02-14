@@ -4,16 +4,16 @@
 
 A modest form library for React, designed to make large form serialization and validation easier. It aims to do so while keeping a healthy balance between declarativeness and readability.
 
-- Basics
-- Nesting
-- API
-- Complex inputs
+- [Basics](#basics)
+- [Complex Forms](#complex-forms)
+- [API][#API]
+- [Complex Inputs](#complex-inputs)
 
 ---------------
 
 ## Basics
 
-First thing you want to do is understand how to assemble your form from `formerly` components and use basic serialization.
+First thing you want to do is understand how to build a form using `formerly` components.
 
 ```js
 import React from 'react'
@@ -52,6 +52,15 @@ function NewsletterForm () {
    )
 }
 
+export default NewsletterForm
+```
+
+Doesn't look too bad, we have our form in place. I'm sure you noticed we passed a function called `handleSubmit` as an event handler for the form submission,
+and you're probably wondering how that would look like. Why, that's actually quite simple!
+
+It looks a bit different from a regular event handler in that you don't need to call `event.preventDefault()` and can just consume the the data right away.
+
+```js
 function handleSubmit (errors, formData) {
   if(errors) return alert("please don't")
 
@@ -67,10 +76,9 @@ function handleSubmit (errors, formData) {
 }
 ```
 
-Diving into the contrived example above, we can see `formerly` exposes a few components with familiar sounding names, `Form`, `Input`, `Select` and `TextArea`.
-You can think of them as extensions to native elements. **Important takeaway: ** *They won't work outside a `Form` and `formerly` wont serialize any other native `<input>` you put inside the `Form`.*
+With this basic example, we introduced the key concepts from formerly. We can see `formerly` exposes a few components with familiar sounding names, `Form`, `Input`, `Select` and `TextArea`. You can think of them as extensions to native elements. **Important takeaway: ** *They won't work outside a `Form` and `formerly` wont serialize any other native `<input>` you put inside the `Form`.*
 
-## Nesting
+## Complex Forms
 
 An important use case we wanted to get just right was the serialization of large forms, which are often complex and have nested objects/arrays in them.
 
@@ -94,7 +102,8 @@ const thisOnePerson = {
 	}]
 }
 ```
-Now your job is to come up with a *single form* to fill all this stuff, scary right? Of course it is, especially from a UX point of view but a job is a job so... `formerly` to the rescue! Here is how we could represent that same object as a form component:
+
+Now suppose your job is to come up with a *single form* to fill all this stuff, scary right? Of course it is, especially from a UX point of view but a job is a job so... `formerly` to the rescue! Here is how we could represent that same object as a form component:
 
 ```js
 import {Form, Entity, Input, Select} from 'formerly'
