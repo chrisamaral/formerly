@@ -6,7 +6,7 @@ A modest form library for React, designed to make large form serialization and v
 
 - [Basics](#basics)
 - [Complex Forms](#complex-forms)
-- [API][#API]
+- [API](#api)
 - [Complex Inputs](#complex-inputs)
 
 ---------------
