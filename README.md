@@ -2,7 +2,7 @@
 
 [![js-standard-style](https://img.shields.io/badge/code%20style-standard-brightgreen.svg)](http://standardjs.com/)
 
-A modest form library for React, designed to make large form serialization and validation easier. It aims to do so while keeping a healthy balance between declarativeness and readability.
+A modest form library for React, designed to make form serialization and validation easier.
 
 - [Basics](#basics)
 - [Complex Forms](#complex-forms)
@@ -55,10 +55,8 @@ function NewsletterForm () {
 export default NewsletterForm
 ```
 
-Doesn't look too bad, we have our form in place. I'm sure you noticed we passed a function called `handleSubmit` as an event handler for the form submission,
-and you're probably wondering how that would look like. Why, that's actually quite simple!
-
-It looks a bit different from a regular event handler in that you don't need to call `event.preventDefault()` and can just consume the the data right away.
+That's it, our very first `formerly` form. Now, you're probably wondering how that `handleSubmit` function looks like.
+It looks just a bit different from a regular event handler, and in a simpler way: you don't need to call `event.preventDefault()` and can just consume the the inputted values right away. Here is how:
 
 ```js
 function handleSubmit (errors, formData) {
@@ -76,13 +74,13 @@ function handleSubmit (errors, formData) {
 }
 ```
 
-With this basic example, we introduced the key concepts from formerly. We can see `formerly` exposes a few components with familiar sounding names, `Form`, `Input`, `Select` and `TextArea`. You can think of them as extensions to native elements. **Important takeaway: ** *They won't work outside a `Form` and `formerly` wont serialize any other native `<input>` you put inside the `Form`.*
+Although being a very basic example, we introduced the key concepts from `formerly`. We can see that it exposes a few components with familiar sounding names, `Form`, `Input`, `Select` and `TextArea`. You can think of them as extensions to native elements. **Important takeaway: ** *They won't work outside a `Form` and `formerly` wont serialize any other native `<input>` you put inside the `Form`.*
 
 ## Complex Forms
 
-An important use case we wanted to get just right was the serialization of large forms, which are often complex and have nested objects/arrays in them.
+An important use case we wanted to get just right was the serialization of larger forms, which are often complex and have nested objects/arrays in them.
 
-So let's say you work for Wikipedia and you have this **person** database storing all kinds of creepy personal information, our hypothetical object representation for a random personality could look like this:
+So, let's get setup a new example. Say, you work for Wikipedia and you have this **person** database storing all kinds of creepy personal information, our hypothetical object representation for a random personality would look like this:
 
 ```js
 const thisOnePerson = {
@@ -103,7 +101,7 @@ const thisOnePerson = {
 }
 ```
 
-Now suppose your job is to come up with a *single form* to fill all this stuff, scary right? Of course it is, especially from a UX point of view but a job is a job so... `formerly` to the rescue! Here is how we could represent that same object as a form component:
+Now suppose your job is to come up with a *single form* to fill all this stuff, scary right? Of course, especially from a UX point of view, it's a nightmare! But a job is a job so... `formerly` to the rescue! Here is how we could represent that same object on a component using `formerly`:
 
 ```js
 import {Form, Entity, Input, Select} from 'formerly'
