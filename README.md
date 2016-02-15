@@ -56,7 +56,7 @@ export default NewsletterForm
 ```
 
 That's it, our very first `formerly` form. Now, you're probably wondering how that `handleSubmit` function looks like.
-It looks just a bit different from a regular event handler, and in a simpler way: you don't need to call `event.preventDefault()` and can just consume the the inputted values right away. Here is how:
+Fortunately, it is just a bit different from your regular event handler, and in a simpler way: you don't need to call `event.preventDefault()` and can just consume the the inputted values right away. Here is how:
 
 ```js
 function handleSubmit (errors, formData) {
