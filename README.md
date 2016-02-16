@@ -74,7 +74,7 @@ function handleSubmit (errors, formData) {
 }
 ```
 
-Although being a very basic example, we introduced the key concepts from `formerly`. We can see that it exposes a few components with familiar sounding names, `Form`, `Input`, `Select` and `TextArea`. You can think of them as extensions to native elements. **Important takeaway: ** *They won't work outside a `Form` and `formerly` wont serialize any other native `<input>` you put inside the `Form`.*
+Although being a very basic example, we introduced the key concepts from `formerly`. We can see that it exposes a few components with familiar sounding names, `Form`, `Input`, `Select` and `TextArea`. You can think of them as extensions to native elements. **Important takeaway**: *They won't work outside a `Form` and `formerly` wont serialize any other native `<input>` you put inside the `Form`.*
 
 ## Complex Forms
 
